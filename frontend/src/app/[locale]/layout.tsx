@@ -7,14 +7,13 @@ import * as newrelic from "newrelic";
 import { Metadata } from "next";
 import { environment } from "src/constants/environments";
 
-import Script from "next/script";
-
 import "src/styles/styles.scss";
 
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, unstable_setRequestLocale } from "next-intl/server";
 
 import Layout from "src/components/Layout";
+import NewRelicScript from "src/components/NewRelicScript";
 
 export const metadata: Metadata = {
   icons: [`${environment.NEXT_PUBLIC_BASE_PATH}/img/favicon.ico`],
@@ -59,6 +58,13 @@ export function generateStaticParams() {
 
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = params;
+  const {
+    NEW_RELIC_ACCOUNT_ID,
+    NEW_RELIC_AGENT_ID,
+    NEW_RELIC_APPLICATION_ID,
+    NEW_RELIC_CLIENT_LICENSE_KEY,
+    NEW_RELIC_TRUST_KEY,
+  } = environment;
 
   // Enable static rendering
   unstable_setRequestLocale(locale);
@@ -74,13 +80,6 @@ export default async function LocaleLayout({ children, params }: Props) {
     });
   }
 
-  const browserTimingHeader = typedNewRelic
-    ? typedNewRelic.getBrowserTimingHeader({
-        hasToRemoveScriptWrapper: true,
-        allowTransactionlessInjection: true,
-      })
-    : "";
-
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
@@ -94,16 +93,12 @@ export default async function LocaleLayout({ children, params }: Props) {
         <NextIntlClientProvider messages={messages}>
           <Layout locale={locale}>{children}</Layout>
         </NextIntlClientProvider>
-        <Script
-          id="nr-browser-agent"
-          // By setting the strategy to "beforeInteractive" we guarantee that
-          // the script will be added to the document's `head` element.
-          // However, we cannot add this because it needs to be in the Root Layout, outside of the [locale] directory
-          // And we cannot add beneath the local directory because our HTML tag needs to know about the locale
-          // Come back to this to see if we can find a solution later on
-          // strategy="beforeInteractive"
-
-          dangerouslySetInnerHTML={{ __html: browserTimingHeader }}
+        <NewRelicScript
+          accountID={NEW_RELIC_ACCOUNT_ID}
+          trustKey={NEW_RELIC_TRUST_KEY}
+          agentID={NEW_RELIC_AGENT_ID}
+          licenseKey={NEW_RELIC_CLIENT_LICENSE_KEY}
+          applicationID={NEW_RELIC_APPLICATION_ID}
         />
       </body>
     </html>

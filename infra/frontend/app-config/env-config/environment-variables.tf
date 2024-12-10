@@ -51,6 +51,27 @@ locals {
     NEW_RELIC_LICENSE_KEY = {
       manage_method     = "manual"
       secret_store_name = "/new-relic-license-key"
-    }
+    },
+    NEW_RELIC_ACCOUNT_ID = {
+      manage_method     = "manual"
+      secret_store_name = "/${var.app_name}/${var.environment}/new-relic-account-id"
+    },
+    NEW_RELIC_TRUST_KEY = {
+      manage_method     = "manual"
+      secret_store_name = "/${var.app_name}/${var.environment}/new-relic-trust-key"
+    },
+    NEW_RELIC_AGENT_ID = {
+      manage_method     = "manual"
+      secret_store_name = "/${var.app_name}/${var.environment}/new-relic-agent-id"
+    },
+    NEW_RELIC_CLIENT_LICENSE_KEY = {
+      manage_method     = "manual"
+      secret_store_name = "/${var.app_name}/${var.environment}/new-relic-client-license-key"
+    },
+    NEW_RELIC_APPLICATION_ID = {
+      manage_method     = "manual"
+      secret_store_name = "/${var.app_name}/${var.environment}/new-relic-application-id"
+    },
+
   }
 }
