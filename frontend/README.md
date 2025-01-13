@@ -62,7 +62,7 @@ See [development.md](../documentation/frontend/development.md) for full installa
 * [Architecture diagram](../documentation/architecture/README.md)
 * [Authentication overview](../documentation/api/authentication.md)
 * [Authentication local setup](../documentation/frontend/development.md#authentication)
-* [Testing](../documentation/frontend/development.md#testing)
-* [Type checking, linting, and formatting](../documentation/frontend/development.md##-type-checking-linting-and-formatting)
+* [Testing](../documentation/frontend/development.md#-testing)
+* [Type checking, linting, and formatting](../documentation/frontend/development.md#-type-checking-linting-and-formatting)
 * [Search and opportunity page local setup](../documentation/frontend/development.md#search-and-opportunity-pages)
   
