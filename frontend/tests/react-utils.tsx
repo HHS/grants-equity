@@ -38,7 +38,7 @@ export * from "@testing-library/react";
 // 2. Then override the "@testing-library/react" render method
 // eslint-disable-next-line import/export
 export function render(
-  ui: React.ReactElement,
+  ui: React.ReactElement<any>,
   options: Omit<RenderOptions, "wrapper"> = {},
 ) {
   return _render(ui, { wrapper: GlobalProviders, ...options });

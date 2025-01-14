@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@newrelic/next": "^0.10.0",
-    "@next/third-parties": "^14.3.0-canary.59",
+    "@next/third-parties": "^15.1.4",
     "@opentelemetry/api": "^1.8.0",
     "@trussworks/react-uswds": "^9.1.0",
     "@uswds/uswds": "^3.7.1",
@@ -43,10 +43,10 @@
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
     "newrelic": "^12.7.0",
-    "next": "^14.2.3",
+    "next": "^15.1.4",
     "next-intl": "^3.2.1",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "server-only": "^0.0.1",
     "sharp": "^0.33.0",
     "zod": "^3.23.8"

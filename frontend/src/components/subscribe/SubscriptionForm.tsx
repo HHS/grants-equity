@@ -1,10 +1,9 @@
 "use client";
 
-import { useFormState } from "react-dom";
 import { subscribeEmail } from "src/app/[locale]/subscribe/actions";
 
 import { useTranslations } from "next-intl";
-import React from "react";
+import React, { useActionState } from "react";
 import {
   ErrorMessage,
   FormGroup,
@@ -22,7 +21,7 @@ export type ValidationErrors = {
 export default function SubscriptionForm() {
   const t = useTranslations("Subscribe");
 
-  const [state, formAction] = useFormState(subscribeEmail, {
+  const [state, formAction] = useActionState(subscribeEmail, {
     errorMessage: "",
     validationErrors: {},
   });
