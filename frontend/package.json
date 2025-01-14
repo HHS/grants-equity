@@ -55,7 +55,6 @@
     "@chromatic-com/storybook": "^1.9.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.0.2",
     "@playwright/test": "^1.44.0",
-    "@storybook/addon-designs": "^8.0.4",
     "@storybook/addon-essentials": "^8.4.2",
     "@storybook/nextjs": "^8.4.2",
     "@storybook/react": "^8.4.2",
