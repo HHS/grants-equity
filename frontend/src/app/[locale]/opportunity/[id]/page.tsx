@@ -32,9 +32,9 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string; locale: string };
+  params: Promise<{ id: string; locale: string }>;
 }) {
-  const { id, locale } = params;
+  const { id, locale } = await params;
   const t = await getTranslations({ locale });
   let title = `${t("OpportunityListing.page_title")}`;
   try {

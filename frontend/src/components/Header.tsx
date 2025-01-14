@@ -1,10 +1,12 @@
 "use client";
-import GrantsLogo from "public/img/grants-logo.png";
+
 import clsx from "clsx";
+import GrantsLogo from "public/img/grants-logo.png";
 import { useFeatureFlags } from "src/hooks/useFeatureFlags";
+
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
@@ -170,13 +172,12 @@ const Header = ({ locale }: Props) => {
             <Title className="margin-y-2">
               <div className="display-flex flex-align-center">
                 <Link href="/" className="display-block">
-                <Image
-                  alt={t("title")}
-                  src={GrantsLogo}
-                  className="display-block height-4  desktop:height-auto"
-                  priority={false}
-                />
-            
+                  <Image
+                    alt={t("title")}
+                    src={GrantsLogo}
+                    className="display-block height-4  desktop:height-auto"
+                    priority={false}
+                  />
                 </Link>
               </div>
             </Title>

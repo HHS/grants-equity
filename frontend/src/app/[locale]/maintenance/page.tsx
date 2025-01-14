@@ -1,24 +1,22 @@
+import { LocalizedPageProps } from "src/types/intl";
+
 import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { use } from "react";
 import { GridContainer } from "@trussworks/react-uswds";
 
-export async function generateMetadata({
-  params: { locale },
-}: {
-  params: { locale: string };
-}) {
+export async function generateMetadata({ params }: LocalizedPageProps) {
+  const { locale } = await params;
   const t = await getTranslations({ locale });
+
   return {
     title: t("Maintenance.pageTitle"),
     description: t("Maintenance.heading"),
   };
 }
 
-export default function Maintenance({
-  params: { locale },
-}: {
-  params: { locale: string };
-}) {
+export default function Maintenance({ params }: LocalizedPageProps) {
+  const { locale } = use(params);
   setRequestLocale(locale);
   const t = useTranslations("Maintenance");
 

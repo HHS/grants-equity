@@ -41,6 +41,7 @@ export const encrypt = async (
   return jwt;
 };
 
-export function deleteSession() {
-  cookies().delete("session");
+export async function deleteSession() {
+  const cookie = await cookies();
+  cookie.delete("session");
 }

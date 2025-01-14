@@ -9,6 +9,7 @@ import { convertSearchParamsToProperTypes } from "src/utils/search/convertSearch
 import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "next/navigation";
+import { use } from "react";
 
 import ContentDisplayToggle from "src/components/ContentDisplayToggle";
 import SearchAnalytics from "src/components/search/SearchAnalytics";
@@ -16,9 +17,8 @@ import SearchBar from "src/components/search/SearchBar";
 import SearchFilters from "src/components/search/SearchFilters";
 import SearchResults from "src/components/search/SearchResults";
 
-export async function generateMetadata({
-  params: { locale },
-}: LocalizedPageProps) {
+export async function generateMetadata({ params }: LocalizedPageProps) {
+  const { locale } = await params;
   const t = await getTranslations({ locale });
   const meta: Metadata = {
     title: t("Search.title"),
@@ -28,10 +28,11 @@ export async function generateMetadata({
 }
 type SearchPageProps = {
   searchParams: SearchParamsTypes;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 };
 
-function Search({ searchParams, params: { locale } }: SearchPageProps) {
+function Search({ searchParams, params }: SearchPageProps) {
+  const { locale } = use(params);
   setRequestLocale(locale);
   const t = useTranslations("Search");
 

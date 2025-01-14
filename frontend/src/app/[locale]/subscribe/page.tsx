@@ -4,15 +4,15 @@ import { LocalizedPageProps } from "src/types/intl";
 
 import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { use } from "react";
 import { Grid, GridContainer } from "@trussworks/react-uswds";
 
 import BetaAlert from "src/components/BetaAlert";
 import Breadcrumbs from "src/components/Breadcrumbs";
 import SubscriptionForm from "src/components/subscribe/SubscriptionForm";
 
-export async function generateMetadata({
-  params: { locale },
-}: LocalizedPageProps) {
+export async function generateMetadata({ params }: LocalizedPageProps) {
+  const { locale } = await params;
   const t = await getTranslations({ locale });
   const meta: Metadata = {
     title: t("Subscribe.page_title"),
@@ -22,7 +22,8 @@ export async function generateMetadata({
   return meta;
 }
 
-export default function Subscribe({ params: { locale } }: LocalizedPageProps) {
+export default function Subscribe({ params }: LocalizedPageProps) {
+  const { locale } = use(params);
   setRequestLocale(locale);
   const t = useTranslations("Subscribe");
 

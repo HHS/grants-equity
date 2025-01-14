@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { LocalizedPageProps } from "src/types/intl";
 
 import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
@@ -7,8 +8,9 @@ import { GridContainer } from "@trussworks/react-uswds";
 
 import BetaAlert from "src/components/BetaAlert";
 
-export async function generateMetadata() {
-  const t = await getTranslations();
+export async function generateMetadata({ params }: LocalizedPageProps) {
+  const { locale } = await params;
+  const t = await getTranslations({ locale });
   const meta: Metadata = {
     title: t("ErrorPages.page_not_found.page_title"),
     description: t("Index.meta_description"),

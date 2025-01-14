@@ -7,13 +7,13 @@ import { PROCESS_CRUMBS } from "src/constants/breadcrumbs";
 import { LocalizedPageProps } from "src/types/intl";
 
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { use } from "react";
 
 import BetaAlert from "src/components/BetaAlert";
 import Breadcrumbs from "src/components/Breadcrumbs";
 
-export async function generateMetadata({
-  params: { locale },
-}: LocalizedPageProps) {
+export async function generateMetadata({ params }: LocalizedPageProps) {
+  const { locale } = await params;
   const t = await getTranslations({ locale });
   const meta: Metadata = {
     title: t("Process.page_title"),
@@ -22,8 +22,10 @@ export async function generateMetadata({
   return meta;
 }
 
-export default function Process({ params: { locale } }: LocalizedPageProps) {
+export default function Process({ params }: LocalizedPageProps) {
+  const { locale } = use(params);
   setRequestLocale(locale);
+
   return (
     <>
       <BetaAlert containerClasses="margin-top-5" />

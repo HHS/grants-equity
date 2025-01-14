@@ -1,5 +1,3 @@
-import React, { JSX } from "react";
-
 import Spinner from "src/components/Spinner";
 
 export interface LoadingProps {
