@@ -123,6 +123,8 @@ module "service" {
   max_capacity           = local.service_config.instance_scaling_max_capacity
   min_capacity           = local.service_config.instance_scaling_min_capacity
   enable_autoscaling     = true
+  enable_s3_cdn          = true
+  s3_cdn_bucket_name     = "public-files"
   cpu                    = local.service_config.instance_cpu
   memory                 = local.service_config.instance_memory
   environment_name       = var.environment_name

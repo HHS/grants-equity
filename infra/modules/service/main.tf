@@ -45,9 +45,13 @@ locals {
     { name : "DB_NAME", value : var.db_vars.connection_info.db_name },
     { name : "DB_SCHEMA", value : var.db_vars.connection_info.schema_name },
   ]
+  cdn_environment_variables = local.enable_cdn ? [
+    { name : "CDN_URL", value : local.cdn_domain_name_env_var },
+  ] : []
   environment_variables = concat(
     local.base_environment_variables,
     local.db_environment_variables,
+    local.cdn_environment_variables,
     [
       for name, value in var.extra_environment_variables :
       { name : name, value : value }

@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "cdn" {
-  count = var.enable_cdn ? 1 : 0
+  count = local.enable_cdn ? 1 : 0
 
   bucket_prefix = "${var.service_name}-cdn-access-logs"
   force_destroy = false
@@ -15,7 +15,7 @@ resource "aws_s3_bucket" "cdn" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "cdn" {
-  count = var.enable_cdn ? 1 : 0
+  count = local.enable_cdn ? 1 : 0
 
   bucket = aws_s3_bucket.cdn[0].id
   rule {
@@ -25,7 +25,7 @@ resource "aws_s3_bucket_ownership_controls" "cdn" {
 }
 
 resource "aws_s3_bucket_acl" "cdn" {
-  count = var.enable_cdn ? 1 : 0
+  count = local.enable_cdn ? 1 : 0
 
   bucket = aws_s3_bucket.cdn[0].id
 
@@ -35,7 +35,7 @@ resource "aws_s3_bucket_acl" "cdn" {
 }
 
 resource "aws_s3_bucket_public_access_block" "cdn" {
-  count = var.enable_cdn ? 1 : 0
+  count = local.enable_cdn ? 1 : 0
 
   bucket = aws_s3_bucket.cdn[0].id
 
@@ -46,7 +46,7 @@ resource "aws_s3_bucket_public_access_block" "cdn" {
 }
 
 data "aws_iam_policy_document" "cdn" {
-  count = var.enable_cdn ? 1 : 0
+  count = local.enable_cdn ? 1 : 0
 
   statement {
     actions = [
@@ -65,14 +65,14 @@ data "aws_iam_policy_document" "cdn" {
 }
 
 resource "aws_s3_bucket_policy" "cdn" {
-  count = var.enable_cdn ? 1 : 0
+  count = local.enable_cdn ? 1 : 0
 
   bucket = aws_s3_bucket.cdn[0].id
   policy = data.aws_iam_policy_document.cdn[0].json
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "cdn" {
-  count = var.enable_cdn ? 1 : 0
+  count = local.enable_cdn ? 1 : 0
 
   bucket = aws_s3_bucket.cdn[0].id
 

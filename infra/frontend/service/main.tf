@@ -131,7 +131,7 @@ module "service" {
   cpu                    = local.service_config.instance_cpu
   memory                 = local.service_config.instance_memory
   enable_autoscaling     = true
-  enable_cdn             = true
+  enable_alb_cdn         = true
 
   app_access_policy_arn      = null
   migrator_access_policy_arn = null

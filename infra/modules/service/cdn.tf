@@ -4,17 +4,35 @@ locals {
   default_origin_id        = "default"
   ssl_protocols            = ["TLSv1.2"]
   minimum_protocol_version = "TLSv1.2_2021"
+  enable_cdn               = var.enable_alb_cdn || var.enable_s3_cdn
 
+  # The domain name of the CDN, ie. URL people use in order to access the CDN.
+  # Null outputs here result in the CDN content being served from the CDN's default domain name.
+  #   - If the origin is an ALB, and the ALB's domain name is not null,
+  #     then use the domain name of the ALB
+  #   - If the origin is an ALB, and the ALB's domain name is null,
+  #     then return null
+  #   - If the origin is an S3 bucket, and the S3 bucket's desired domain name is not null,
+  #     then use the domain name of the S3 bucket
+  #   - If the origin is an S3 bucket, and the S3 bucket's desired domain name is null,
+  #     then return null
+  cdn_domain_name         = var.enable_alb_cdn && var.domain != null ? var.domain : var.enable_s3_cdn && var.s3_cdn_domain_name != null ? var.s3_cdn_domain_name : null
+  cdn_domain_name_env_var = local.cdn_domain_name != null ? local.cdn_domain_name : aws_cloudfront_distribution.cdn[0].domain_name
+
+  # The domain name of the origin, ie. where the content is being served from.
+  #   - If the origin is an ALB, this is the DNS name of the ALB
+  #   - If the origin is an S3 bucket, this is the regional domain name of the S3 bucket.
+  origin_domain_name = var.enable_alb_cdn ? aws_lb.alb[0].dns_name : var.enable_s3_cdn ? aws_s3_bucket.s3_buckets[var.s3_cdn_bucket_name].bucket_regional_domain_name : null
 }
 
 resource "aws_cloudfront_origin_access_identity" "cdn" {
-  count = var.enable_cdn ? 1 : 0
+  count = local.enable_cdn ? 1 : 0
 
   comment = "Origin Access Identity for CloudFront to access S3 bucket"
 }
 
 resource "aws_cloudfront_cache_policy" "default" {
-  count = var.enable_cdn ? 1 : 0
+  count = local.enable_cdn ? 1 : 0
 
   name = var.service_name
 
@@ -39,13 +57,13 @@ resource "aws_cloudfront_cache_policy" "default" {
 }
 
 resource "aws_cloudfront_distribution" "cdn" {
-  count = var.enable_cdn ? 1 : 0
+  count = local.enable_cdn ? 1 : 0
 
-  enabled = var.enable_cdn ? true : false
-  aliases = var.domain == null ? null : [var.domain]
+  enabled = local.enable_cdn ? true : false
+  aliases = local.cdn_domain_name == null ? null : [local.cdn_domain_name]
 
   origin {
-    domain_name = aws_lb.alb[0].dns_name
+    domain_name = local.origin_domain_name
     origin_id   = local.default_origin_id
     custom_origin_config {
       http_port              = 80
@@ -105,7 +123,7 @@ resource "aws_cloudfront_distribution" "cdn" {
     aws_s3_bucket.cdn[0],
   ]
 
-  #checkov:skip=CKV2_AWS_46:We aren't using a S3 origin
+  #checkov:skip=CKV2_AWS_46:We sometimes use a ALB origin
   #checkov:skip=CKV_AWS_174:False positive
   #checkov:skip=CKV_AWS_310:Configure a failover in future work
   #checkov:skip=CKV_AWS_68:Configure WAF in future work
