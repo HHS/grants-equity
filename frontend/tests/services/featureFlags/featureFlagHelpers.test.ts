@@ -58,6 +58,7 @@ describe("getFeatureFlagsFromCookie", () => {
   });
 
   // // do we still need to support this?
+  // eslint-disable-next-line jest/no-disabled-tests, jest/no-commented-out-tests
   // test("getter loads feature flags with server-side getServerSideProps cookies", () => {
   //   const cookieRecord = {
   //     // Was unable to override flag keys. Use feature flag class invocation default for now.

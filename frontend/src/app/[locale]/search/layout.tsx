@@ -9,12 +9,12 @@ import SearchCallToAction from "src/components/search/SearchCallToAction";
 
 export default function SearchLayout({
   children,
-  params
+  params,
 }: {
   children: React.ReactNode;
   params: Promise<{
     locale: string;
-  }>
+  }>;
 }) {
   const { locale } = use(params);
   setRequestLocale(locale);

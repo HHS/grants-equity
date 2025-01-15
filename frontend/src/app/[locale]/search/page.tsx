@@ -37,7 +37,8 @@ function Search({ searchParams, params }: SearchPageProps) {
   setRequestLocale(locale);
   const t = useTranslations("Search");
 
-  const convertedSearchParams = convertSearchParamsToProperTypes(searchParamsRead);
+  const convertedSearchParams =
+    convertSearchParamsToProperTypes(searchParamsRead);
   const { agency, category, eligibility, fundingInstrument, query, status } =
     convertedSearchParams;
 

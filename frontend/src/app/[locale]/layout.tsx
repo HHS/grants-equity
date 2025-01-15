@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 
 interface Props {
   children: React.ReactNode;
-  params: Promise<{locale: string}>;
+  params: Promise<{ locale: string }>;
 }
 
 type NRType = typeof newrelic;

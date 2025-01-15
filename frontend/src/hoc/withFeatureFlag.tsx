@@ -23,7 +23,7 @@ const withFeatureFlag = <P, R>(
   const ComponentWithFeatureFlagAndSearchParams = async (
     props: P & WithFeatureFlagProps,
   ) => {
-    const searchParams = await props.searchParams || {};
+    const searchParams = (await props.searchParams) || {};
     const cookiesRead = await cookies();
     const ComponentWithFeatureFlag = (props: P & WithFeatureFlagProps) => {
       if (
@@ -39,7 +39,9 @@ const withFeatureFlag = <P, R>(
 
       return <WrappedComponent {...props} />;
     };
-    return <ComponentWithFeatureFlag {...props} searchParams={props.searchParams} />;
+    return (
+      <ComponentWithFeatureFlag {...props} searchParams={props.searchParams} />
+    );
   };
 
   return ComponentWithFeatureFlagAndSearchParams;
