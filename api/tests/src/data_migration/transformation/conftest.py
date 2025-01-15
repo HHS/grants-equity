@@ -52,6 +52,7 @@ def setup_opportunity(
     if create_existing:
         f.OpportunityFactory.create(
             opportunity_id=source_opportunity.opportunity_id,
+            opportunity_attachments=[],
             # set created_at/updated_at to an earlier time so its clear
             # when they were last updated
             timestamps_in_past=True,

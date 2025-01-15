@@ -1,7 +1,6 @@
 import pytest
 
 import tests.src.db.models.factories as f
-from src.adapters.aws import S3Config
 from src.data_migration.transformation import transform_constants
 from src.data_migration.transformation.subtask.transform_opportunity_attachment import (
     TransformOpportunityAttachment,
@@ -16,13 +15,6 @@ from tests.src.data_migration.transformation.conftest import (
 
 
 class TestTransformOpportunitySummary(BaseTransformTestClass):
-
-    @pytest.fixture
-    def s3_config(self, mock_s3_bucket, other_mock_s3_bucket):
-        return S3Config(
-            PUBLIC_FILES_BUCKET=f"s3://{mock_s3_bucket}",
-            DRAFT_FILES_BUCKET=f"s3://{other_mock_s3_bucket}",
-        )
 
     @pytest.fixture()
     def transform_opportunity_attachment(self, transform_oracle_data_task, s3_config):

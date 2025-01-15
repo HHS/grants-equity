@@ -1,4 +1,5 @@
 import os
+import shutil
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -95,7 +96,28 @@ def get_file_length_bytes(path: str) -> int:
     return file_stats.st_size
 
 
-def delete_file(path: str) -> None:
+def copy_file(source_path: str | Path, destination_path: str | Path) -> None:
+    is_source_s3 = is_s3_path(source_path)
+    is_dest_s3 = is_s3_path(destination_path)
+
+    # This isn't a download or upload method
+    # Don't allow "copying" between mismatched locations
+    if is_source_s3 != is_dest_s3:
+        raise Exception("Cannot download/upload between disk and S3 using this method")
+
+    if is_source_s3:
+        s3_client = get_s3_client()
+
+        source_bucket, source_path = split_s3_url(source_path)
+        dest_bucket, dest_path = split_s3_url(destination_path)
+
+        s3_client.copy({"Bucket": source_bucket, "Key": source_path}, dest_bucket, dest_path)
+    else:
+        os.makedirs(os.path.dirname(destination_path), exist_ok=True)
+        shutil.copy2(source_path, destination_path)
+
+
+def delete_file(path: str | Path) -> None:
     """Delete a file from s3 or local disk"""
     if is_s3_path(path):
         bucket, s3_path = split_s3_url(path)
@@ -104,6 +126,23 @@ def delete_file(path: str) -> None:
         s3_client.delete_object(Bucket=bucket, Key=s3_path)
     else:
         os.remove(path)
+
+
+def move_file(source_path: str | Path, destination_path: str | Path) -> None:
+    is_source_s3 = is_s3_path(source_path)
+    is_dest_s3 = is_s3_path(destination_path)
+
+    # This isn't a download or upload method
+    # Don't allow "copying" between mismatched locations
+    if is_source_s3 != is_dest_s3:
+        raise Exception("Cannot download/upload between disk and S3 using this method")
+
+    if is_source_s3:
+        copy_file(source_path, destination_path)
+        delete_file(source_path)
+
+    else:
+        os.renames(source_path, destination_path)
 
 
 def file_exists(path: str | Path) -> bool:
@@ -121,3 +160,9 @@ def file_exists(path: str | Path) -> bool:
 
     # Local file system
     return Path(path).exists()
+
+
+def read_file(path: str | Path, mode: str = "r", encoding: str | None = None) -> str:
+    """Simple function for just getting all of the contents of a file"""
+    with open_stream(path, mode, encoding) as input_file:
+        return input_file.read()

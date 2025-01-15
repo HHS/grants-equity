@@ -36,7 +36,12 @@ class TestTransformFullRunTask(BaseTestClass):
 
     @pytest.fixture()
     def transform_oracle_data_task(
-        self, db_session, enable_factory_create, truncate_opportunities, truncate_all_staging_tables
+        self,
+        db_session,
+        enable_factory_create,
+        truncate_opportunities,
+        truncate_all_staging_tables,
+        s3_config,
     ) -> TransformOracleDataTask:
         return TransformOracleDataTask(db_session)
 
@@ -466,7 +471,10 @@ class TestTransformFullRunTask(BaseTestClass):
         # but we'll still have delete events for the others - this verfies how we handle that.
 
         existing_opportunity = f.OpportunityFactory(
-            no_current_summary=True, opportunity_assistance_listings=[], agency_code="AGENCYXYZ"
+            no_current_summary=True,
+            opportunity_assistance_listings=[],
+            agency_code="AGENCYXYZ",
+            opportunity_attachments=[],
         )
         opportunity = f.StagingTopportunityFactory(
             opportunity_id=existing_opportunity.opportunity_id, cfdas=[], is_deleted=True

@@ -5,6 +5,7 @@ import pytest
 from smart_open import open as smart_open
 
 import src.util.file_util as file_util
+import tests.src.db.models.factories as f
 
 
 def create_file(root_path, file_path):
@@ -117,12 +118,12 @@ def test_file_exists_local_filesystem(tmp_path):
     file_path2 = tmp_path / "test2.txt"
     file_path3 = tmp_path / "test3.txt"
 
-    with file_util.open_stream(file_path1, "w") as f:
-        f.write("hello")
-    with file_util.open_stream(file_path2, "w") as f:
-        f.write("hello")
-    with file_util.open_stream(file_path3, "w") as f:
-        f.write("hello")
+    with file_util.open_stream(file_path1, "w") as outfile:
+        outfile.write("hello")
+    with file_util.open_stream(file_path2, "w") as outfile:
+        outfile.write("hello")
+    with file_util.open_stream(file_path3, "w") as outfile:
+        outfile.write("hello")
 
     assert file_util.file_exists(file_path1) is True
     assert file_util.file_exists(file_path2) is True
@@ -136,15 +137,77 @@ def test_file_exists_s3(mock_s3_bucket):
     file_path2 = f"s3://{mock_s3_bucket}/test2.txt"
     file_path3 = f"s3://{mock_s3_bucket}/test3.txt"
 
-    with file_util.open_stream(file_path1, "w") as f:
-        f.write("hello")
-    with file_util.open_stream(file_path2, "w") as f:
-        f.write("hello")
-    with file_util.open_stream(file_path3, "w") as f:
-        f.write("hello")
+    with file_util.open_stream(file_path1, "w") as outfile:
+        outfile.write("hello")
+    with file_util.open_stream(file_path2, "w") as outfile:
+        outfile.write("hello")
+    with file_util.open_stream(file_path3, "w") as outfile:
+        outfile.write("hello")
 
     assert file_util.file_exists(file_path1) is True
     assert file_util.file_exists(file_path2) is True
     assert file_util.file_exists(file_path3) is True
     assert file_util.file_exists(f"s3://{mock_s3_bucket}/test4.txt") is False
     assert file_util.file_exists(f"s3://{mock_s3_bucket}/test5.txt") is False
+
+
+def test_copy_file_s3(mock_s3_bucket, other_mock_s3_bucket):
+    file_path = f"s3://{mock_s3_bucket}/my_file.txt"
+
+    with file_util.open_stream(file_path, "w") as outfile:
+        outfile.write(f.fake.sentence(25))
+
+    other_file_path = f"s3://{other_mock_s3_bucket}/my_new_file.txt"
+    file_util.copy_file(file_path, other_file_path)
+
+    assert file_util.file_exists(file_path) is True
+    assert file_util.file_exists(other_file_path) is True
+
+    assert file_util.read_file(file_path) == file_util.read_file(other_file_path)
+
+
+def test_copy_file_local_disk(tmp_path):
+    file_path = tmp_path / "my_file.txt"
+
+    with file_util.open_stream(file_path, "w") as outfile:
+        outfile.write(f.fake.sentence(25))
+
+    other_file_path = tmp_path / "my_file2.txt"
+    file_util.copy_file(file_path, other_file_path)
+
+    assert file_util.file_exists(file_path) is True
+    assert file_util.file_exists(other_file_path) is True
+
+    assert file_util.read_file(file_path) == file_util.read_file(other_file_path)
+
+
+def test_move_file_s3(mock_s3_bucket, other_mock_s3_bucket):
+    file_path = f"s3://{mock_s3_bucket}/my_file_to_copy.txt"
+
+    contents = f.fake.sentence(25)
+    with file_util.open_stream(file_path, "w") as outfile:
+        outfile.write(contents)
+
+    other_file_path = f"s3://{other_mock_s3_bucket}/my_destination_file.txt"
+    file_util.move_file(file_path, other_file_path)
+
+    assert file_util.file_exists(file_path) is False
+    assert file_util.file_exists(other_file_path) is True
+
+    assert file_util.read_file(other_file_path) == contents
+
+
+def test_move_file_local_disk(tmp_path):
+    file_path = tmp_path / "my_file_to_move.txt"
+
+    contents = f.fake.sentence(25)
+    with file_util.open_stream(file_path, "w") as outfile:
+        outfile.write(contents)
+
+    other_file_path = tmp_path / "my_moved_file.txt"
+    file_util.move_file(file_path, other_file_path)
+
+    assert file_util.file_exists(file_path) is False
+    assert file_util.file_exists(other_file_path) is True
+
+    assert file_util.read_file(other_file_path) == contents

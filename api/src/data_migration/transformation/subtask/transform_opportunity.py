@@ -1,18 +1,31 @@
 import logging
-from typing import Tuple
+from typing import Tuple, cast
 
 import src.data_migration.transformation.transform_constants as transform_constants
 import src.data_migration.transformation.transform_util as transform_util
+from src.adapters.aws import S3Config
 from src.data_migration.transformation.subtask.abstract_transform_subtask import (
     AbstractTransformSubTask,
 )
 from src.db.models.opportunity_models import Opportunity
 from src.db.models.staging.opportunity import Topportunity
+from src.services.opportunity_attachments import attachment_util
+from src.task.task import Task
+from src.util import file_util
 
 logger = logging.getLogger(__name__)
 
 
 class TransformOpportunity(AbstractTransformSubTask):
+
+    def __init__(self, task: Task, s3_config: S3Config | None = None):
+        super().__init__(task)
+
+        if s3_config is None:
+            s3_config = S3Config()
+
+        self.s3_config = s3_config
+
     def transform_records(self) -> None:
         # Fetch all opportunities that were modified
         # Alongside that, grab the existing opportunity record
@@ -53,10 +66,17 @@ class TransformOpportunity(AbstractTransformSubTask):
                 extra,
             )
 
+            # Cleanup the attachments from s3
+            if target_opportunity is not None:
+                for attachment in target_opportunity.opportunity_attachments:
+                    file_util.delete_file(attachment.file_location)
+
         else:
             # To avoid incrementing metrics for records we fail to transform, record
             # here whether it's an insert/update and we'll increment after transforming
             is_insert = target_opportunity is None
+
+            was_draft = target_opportunity.is_draft if target_opportunity else None
 
             logger.info("Transforming and upserting opportunity", extra=extra)
             transformed_opportunity = transform_util.transform_opportunity(
@@ -75,6 +95,24 @@ class TransformOpportunity(AbstractTransformSubTask):
                     prefix=transform_constants.OPPORTUNITY,
                 )
                 self.db_session.merge(transformed_opportunity)
+
+                # If an opportunity went from being a draft to not a draft (published)
+                # then we need to move all of its attachments to the public bucket
+                # from the draft s3 bucket.
+                if was_draft and transformed_opportunity.is_draft is False:
+                    for attachment in cast(Opportunity, target_opportunity).opportunity_attachments:
+                        # Determine the new path
+                        file_name = attachment_util.adjust_legacy_file_name(attachment.file_name)
+                        s3_path = attachment_util.get_s3_attachment_path(
+                            file_name,
+                            attachment.attachment_id,
+                            transformed_opportunity,
+                            self.s3_config,
+                        )
+
+                        # Move the file
+                        file_util.move_file(attachment.file_location, s3_path)
+                        attachment.file_location = s3_path
 
         logger.info("Processed opportunity", extra=extra)
         source_opportunity.transformed_at = self.transform_time

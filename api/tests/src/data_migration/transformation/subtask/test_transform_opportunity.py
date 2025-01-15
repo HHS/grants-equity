@@ -2,17 +2,20 @@ import pytest
 
 import src.data_migration.transformation.transform_constants as transform_constants
 from src.data_migration.transformation.subtask.transform_opportunity import TransformOpportunity
+from src.services.opportunity_attachments import attachment_util
+from src.util import file_util
 from tests.src.data_migration.transformation.conftest import (
     BaseTransformTestClass,
     setup_opportunity,
     validate_opportunity,
 )
+from tests.src.db.models.factories import OpportunityAttachmentFactory, OpportunityFactory
 
 
 class TestTransformOpportunity(BaseTransformTestClass):
     @pytest.fixture()
-    def transform_opportunity(self, transform_oracle_data_task, truncate_staging_tables):
-        return TransformOpportunity(transform_oracle_data_task)
+    def transform_opportunity(self, transform_oracle_data_task, truncate_staging_tables, s3_config):
+        return TransformOpportunity(transform_oracle_data_task, s3_config)
 
     def test_process_opportunities(self, db_session, transform_opportunity):
         ordinary_delete = setup_opportunity(
@@ -97,3 +100,73 @@ class TestTransformOpportunity(BaseTransformTestClass):
             transform_opportunity.process_opportunity(insert_that_will_fail, None)
 
         validate_opportunity(db_session, insert_that_will_fail, expect_in_db=False)
+
+    def test_process_opportunity_delete_with_attachments(
+        self, db_session, transform_opportunity, s3_config
+    ):
+
+        source_opportunity = setup_opportunity(create_existing=False, is_delete=True)
+
+        target_opportunity = OpportunityFactory.create(
+            opportunity_id=source_opportunity.opportunity_id, opportunity_attachments=[]
+        )
+
+        attachments = []
+        for i in range(10):
+            s3_path = attachment_util.get_s3_attachment_path(
+                f"my_file{i}.txt", i, target_opportunity, s3_config
+            )
+
+            with file_util.open_stream(s3_path, "w") as outfile:
+                outfile.write(f"This is the {i}th file")
+
+            attachment = OpportunityAttachmentFactory.create(
+                opportunity=target_opportunity, file_location=s3_path
+            )
+            attachments.append(attachment)
+
+        transform_opportunity.process_opportunity(source_opportunity, target_opportunity)
+
+        validate_opportunity(db_session, source_opportunity, expect_in_db=False)
+
+        # Verify all of the files were deleted
+        for attachment in attachments:
+            assert file_util.file_exists(attachment.file_location) is False
+
+    def test_process_opportunity_update_to_non_draft_with_attachments(
+        self, db_session, transform_opportunity, s3_config
+    ):
+
+        source_opportunity = setup_opportunity(
+            create_existing=False, source_values={"is_draft": "N"}
+        )
+
+        target_opportunity = OpportunityFactory.create(
+            opportunity_id=source_opportunity.opportunity_id,
+            is_draft=True,
+            opportunity_attachments=[],
+        )
+
+        attachments = []
+        for i in range(10):
+            s3_path = attachment_util.get_s3_attachment_path(
+                f"my_file{i}.txt", i, target_opportunity, s3_config
+            )
+            assert s3_path.startswith(s3_config.draft_files_bucket_path) is True
+
+            with file_util.open_stream(s3_path, "w") as outfile:
+                outfile.write(f"This is the {i}th file")
+
+            attachment = OpportunityAttachmentFactory.create(
+                opportunity=target_opportunity, file_location=s3_path
+            )
+            attachments.append(attachment)
+
+        transform_opportunity.process_opportunity(source_opportunity, target_opportunity)
+
+        validate_opportunity(db_session, source_opportunity)
+
+        # Verify all of the files were moved to the public bucket
+        for attachment in attachments:
+            assert attachment.file_location.startswith(s3_config.public_files_bucket_path) is True
+            assert file_util.file_exists(attachment.file_location) is True
