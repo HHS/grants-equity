@@ -75,7 +75,7 @@ const UserDropdown = ({
   );
 
   return (
-    <div className="usa-nav__primary-item border-top-0 mobile-nav-dropdown-uncollapsed-override">
+    <div className="usa-nav__primary-item border-top-0 mobile-nav-dropdown-uncollapsed-override position-relative">
       <NavDropDownButton
         className="padding-y-0 padding-x-2 margin-right-2 height-6"
         // The NavDropDownButton needlessly restricts the label to a string, when passing an Element works
@@ -89,7 +89,7 @@ const UserDropdown = ({
         menuId="user-control"
       />
       <Menu
-        className="position-absolute desktop:width-full z-200"
+        className="position-absolute desktop:width-full z-200 right-0"
         id="user-control"
         items={[
           <UserEmailItem key="email" isSubnav={true} email={user.email} />,
