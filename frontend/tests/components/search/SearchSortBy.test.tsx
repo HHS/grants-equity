@@ -1,23 +1,11 @@
 import { fireEvent } from "@testing-library/react";
 import { axe } from "jest-axe";
-import { identity } from "lodash";
-import { QueryContext } from "src/app/[locale]/search/QueryProvider";
 import { useTranslationsMock } from "src/utils/testing/intlMocks";
 import { render, screen } from "tests/react-utils";
 
 import SearchSortBy from "src/components/search/SearchSortBy";
 
 const updateQueryParamsMock = jest.fn();
-const updateTotalResultsMock = jest.fn();
-
-const fakeContext = {
-  queryTerm: "",
-  updateQueryTerm: identity,
-  totalPages: "1",
-  updateTotalPages: identity,
-  totalResults: "1",
-  updateTotalResults: updateTotalResultsMock,
-};
 
 // Mock the useSearchParamUpdater hook
 jest.mock("src/hooks/useSearchParamUpdater", () => ({
@@ -34,11 +22,7 @@ jest.mock("next-intl", () => ({
 describe("SearchSortBy", () => {
   it("should not have basic accessibility issues", async () => {
     const { container } = render(
-      <SearchSortBy
-        totalResults={"10"}
-        queryTerm="test"
-        sortby="closeDateDesc"
-      />,
+      <SearchSortBy queryTerm="test" sortby="closeDateDesc" />,
     );
 
     const results = await axe(container);
@@ -46,7 +30,7 @@ describe("SearchSortBy", () => {
   });
 
   it("renders correctly with initial query params", () => {
-    render(<SearchSortBy totalResults={"10"} queryTerm="test" sortby="" />);
+    render(<SearchSortBy queryTerm="test" sortby="" />);
 
     const defaultOption = screen.getByRole("option", {
       selected: true,
@@ -58,7 +42,7 @@ describe("SearchSortBy", () => {
   });
 
   it("updates sort option and on change", () => {
-    render(<SearchSortBy totalResults={"10"} queryTerm="test" sortby="" />);
+    render(<SearchSortBy queryTerm="test" sortby="" />);
 
     let selectedOption = screen.getByRole("option", {
       selected: true,
@@ -82,11 +66,7 @@ describe("SearchSortBy", () => {
   });
 
   it("calls expected search update functions on change", () => {
-    render(
-      <QueryContext.Provider value={fakeContext}>
-        <SearchSortBy totalResults={"10"} queryTerm="test" sortby="" />
-      </QueryContext.Provider>,
-    );
+    render(<SearchSortBy queryTerm="test" sortby="" />);
 
     fireEvent.change(screen.getByLabelText("sortBy.label"), {
       target: { value: "opportunityTitleDesc" },
@@ -97,7 +77,5 @@ describe("SearchSortBy", () => {
       "sortby",
       "test",
     );
-
-    expect(updateTotalResultsMock).toHaveBeenCalledWith("10");
   });
 });

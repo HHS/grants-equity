@@ -5,7 +5,7 @@ import { QueryContext } from "src/app/[locale]/search/QueryProvider";
 import { useTranslations } from "next-intl";
 import { useContext } from "react";
 
-import SearchSortyBy from "./SearchSortBy";
+import SearchSortBy from "./SearchSortBy";
 
 export default function SearchResultsHeader({
   sortby,
@@ -36,11 +36,7 @@ export default function SearchResultsHeader({
         {t("resultsHeader.message", { count: total })}
       </h2>
       <div className="tablet-lg:grid-col-auto">
-        <SearchSortyBy
-          totalResults={total}
-          sortby={sortby}
-          queryTerm={queryTerm}
-        />
+        <SearchSortBy sortby={sortby} queryTerm={queryTerm} />
       </div>
     </div>
   );

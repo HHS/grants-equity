@@ -66,6 +66,7 @@ export default function SearchPagination({
     <div className={`grants-pagination ${loading ? "disabled" : ""}`}>
       {totalResults !== "0" && pageCount > 0 && (
         <Pagination
+          aria-disabled={loading}
           pathname="/search"
           totalPages={pageCount}
           currentPage={page}

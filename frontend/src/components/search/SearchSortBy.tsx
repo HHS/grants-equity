@@ -4,12 +4,12 @@ import { useSearchParamUpdater } from "src/hooks/useSearchParamUpdater";
 import { SortOption } from "src/types/search/searchRequestTypes";
 
 import { useTranslations } from "next-intl";
+import { useCallback } from "react";
 import { Select } from "@trussworks/react-uswds";
 
 interface SearchSortByProps {
   queryTerm: string | null | undefined;
   sortby: string | null;
-  totalResults: string;
 }
 
 export default function SearchSortBy({ queryTerm, sortby }: SearchSortByProps) {
@@ -45,10 +45,13 @@ export default function SearchSortBy({ queryTerm, sortby }: SearchSortByProps) {
     },
   ];
 
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const newValue = event.target.value;
-    updateQueryParams(newValue, "sortby", queryTerm);
-  };
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<HTMLSelectElement>) => {
+      const newValue = event.target.value;
+      updateQueryParams(newValue, "sortby", queryTerm);
+    },
+    [queryTerm, updateQueryParams],
+  );
 
   return (
     <div id="search-sort-by">
