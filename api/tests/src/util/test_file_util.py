@@ -62,7 +62,7 @@ def test_get_s3_bucket(path, bucket):
         ("s3://bucket/folder/test.txt", "folder/test.txt"),
         ("s3://bucket_x/file.csv", "file.csv"),
         ("s3://bucket-y/folder/path/to/abc.zip", "folder/path/to/abc.zip"),
-        ("./folder/path", "/folder/path"),
+        ("./folder/path", "./folder/path"),
         ("sftp://folder/filename", "filename"),
     ],
 )
@@ -110,3 +110,41 @@ def test_get_file_length_bytes_s3_with_content(mock_s3_bucket):
 
     # Verify size matches content length
     assert size == len(test_content)
+
+
+def test_file_exists_local_filesystem(tmp_path):
+    file_path1 = tmp_path / "test.txt"
+    file_path2 = tmp_path / "test2.txt"
+    file_path3 = tmp_path / "test3.txt"
+
+    with file_util.open_stream(file_path1, "w") as f:
+        f.write("hello")
+    with file_util.open_stream(file_path2, "w") as f:
+        f.write("hello")
+    with file_util.open_stream(file_path3, "w") as f:
+        f.write("hello")
+
+    assert file_util.file_exists(file_path1) is True
+    assert file_util.file_exists(file_path2) is True
+    assert file_util.file_exists(file_path3) is True
+    assert file_util.file_exists(tmp_path / "test4.txt") is False
+    assert file_util.file_exists(tmp_path / "test5.txt") is False
+
+
+def test_file_exists_s3(mock_s3_bucket):
+    file_path1 = f"s3://{mock_s3_bucket}/test.txt"
+    file_path2 = f"s3://{mock_s3_bucket}/test2.txt"
+    file_path3 = f"s3://{mock_s3_bucket}/test3.txt"
+
+    with file_util.open_stream(file_path1, "w") as f:
+        f.write("hello")
+    with file_util.open_stream(file_path2, "w") as f:
+        f.write("hello")
+    with file_util.open_stream(file_path3, "w") as f:
+        f.write("hello")
+
+    assert file_util.file_exists(file_path1) is True
+    assert file_util.file_exists(file_path2) is True
+    assert file_util.file_exists(file_path3) is True
+    assert file_util.file_exists(f"s3://{mock_s3_bucket}/test4.txt") is False
+    assert file_util.file_exists(f"s3://{mock_s3_bucket}/test5.txt") is False

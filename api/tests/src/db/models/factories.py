@@ -227,11 +227,11 @@ class CustomProvider(BaseProvider):
     YN_YESNO_BOOLEAN_VALUES = ["Y", "N", "Yes", "No"]
 
     OPPORTUNITY_ATTACHMENT_S3_PATHS = [
-        "s3://local-opportunities/test_file_1.txt",
-        "s3://local-opportunities/test_file_2.txt",
-        "s3://local-opportunities/test_file_3.txt",
-        "s3://local-opportunities/test_file_4.pdf",
-        "s3://local-opportunities/test_file_5.pdf",
+        "s3://local-mock-public-bucket/test_file_1.txt",
+        "s3://local-mock-public-bucket/test_file_2.txt",
+        "s3://local-mock-public-bucket/test_file_3.txt",
+        "s3://local-mock-public-bucket/test_file_4.pdf",
+        "s3://local-mock-public-bucket/test_file_5.pdf",
     ]
 
     def agency_code(self) -> str:
@@ -332,7 +332,7 @@ class OpportunityAttachmentFactory(BaseFactory):
 
     file_location = factory.Faker("s3_file_location")
     mime_type = factory.Faker("mime_type")
-    file_name = factory.Faker("file_name")
+    file_name = factory.Faker("file_name", category="text")
     file_description = factory.Faker("sentence")
     file_size_bytes = factory.Faker("random_int", min=1000, max=10000000)
     opportunity_attachment_type = factory.fuzzy.FuzzyChoice(OpportunityAttachmentType)
@@ -1006,9 +1006,9 @@ class TsynopsisAttachmentFactory(BaseFactory):
     att_type: factory.Faker("att_type")
     mime_type = factory.Faker("mime_type")
     link_url = factory.Faker("relevant_url")
-    file_name = factory.Faker("file_name")
+    file_name = factory.Faker("file_name", category="text")
     file_desc = factory.Faker("sentence")
-    file_lob = b"Test attachment"
+    file_lob = factory.LazyFunction(lambda: fake.sentence(25).encode())
     file_lob_size = factory.LazyAttribute(lambda x: len(x.file_lob))
     create_date = factory.Faker("date_time_between", start_date="-1y", end_date="now")
     created_date = factory.LazyAttribute(

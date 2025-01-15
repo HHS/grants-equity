@@ -6,6 +6,7 @@ import botocore.exceptions
 
 import src.logging
 from src.adapters.aws import S3Config, get_s3_client
+from src.util import file_util
 from src.util.local import error_if_not_local
 
 logger = logging.getLogger(__name__)
@@ -26,6 +27,14 @@ def does_s3_bucket_exist(s3_client: botocore.client.BaseClient, bucket_name: str
     return False
 
 
+def create_bucket_if_not_exists(s3_client: botocore.client.BaseClient, bucket_name: str) -> None:
+    if not does_s3_bucket_exist(s3_client, bucket_name):
+        logger.info("Creating S3 bucket %s", bucket_name)
+        s3_client.create_bucket(Bucket=bucket_name)
+    else:
+        logger.info("S3 bucket %s already exists - skipping creation", bucket_name)
+
+
 def setup_s3() -> None:
     s3_config = S3Config()
     # This is only used locally - to avoid any accidental running of commands here
@@ -35,14 +44,12 @@ def setup_s3() -> None:
         s3_config, boto3.Session(aws_access_key_id="NO_CREDS", aws_secret_access_key="NO_CREDS")
     )
 
-    if s3_config.s3_opportunity_bucket is None:
-        raise Exception("S3_OPPORTUNITY_BUCKET env var must be set")
-
-    if not does_s3_bucket_exist(s3_client, s3_config.s3_opportunity_bucket):
-        logger.info("Creating S3 bucket %s", s3_config.s3_opportunity_bucket)
-        s3_client.create_bucket(Bucket=s3_config.s3_opportunity_bucket)
-    else:
-        logger.info("S3 bucket %s already exists - skipping", s3_config.s3_opportunity_bucket)
+    create_bucket_if_not_exists(
+        s3_client, file_util.get_s3_bucket(s3_config.public_files_bucket_path)
+    )
+    create_bucket_if_not_exists(
+        s3_client, file_util.get_s3_bucket(s3_config.draft_files_bucket_path)
+    )
 
 
 def main() -> None:

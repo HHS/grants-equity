@@ -1,8 +1,9 @@
 import os
-from pathlib import PosixPath
-from typing import Any, Optional, Tuple
+from pathlib import Path
+from typing import Any
 from urllib.parse import urlparse
 
+import botocore
 import smart_open
 from botocore.config import Config
 
@@ -13,23 +14,23 @@ from src.adapters.aws import S3Config, get_boto_session, get_s3_client
 ##################################
 
 
-def is_s3_path(path: str | PosixPath) -> bool:
+def is_s3_path(path: str | Path) -> bool:
     return str(path).startswith("s3://")
 
 
-def split_s3_url(path: str) -> Tuple[str, str]:
-    parts = urlparse(path)
+def split_s3_url(path: str | Path) -> tuple[str, str]:
+    parts = urlparse(str(path))
     bucket_name = parts.netloc
     prefix = parts.path.lstrip("/")
-    return (bucket_name, prefix)
+    return bucket_name, prefix
 
 
-def get_s3_bucket(path: str) -> Optional[str]:
-    return urlparse(path).hostname
+def get_s3_bucket(path: str | Path) -> str:
+    return split_s3_url(path)[0]
 
 
-def get_s3_file_key(path: str) -> str:
-    return urlparse(path).path[1:]
+def get_s3_file_key(path: str | Path) -> str:
+    return split_s3_url(path)[1]
 
 
 def get_file_name(path: str) -> str:
@@ -45,15 +46,17 @@ def join(*parts: str) -> str:
 ##################################
 
 
-def open_stream(path: str, mode: str = "r", encoding: str | None = None) -> Any:
+def open_stream(path: str | Path, mode: str = "r", encoding: str | None = None) -> Any:
     if is_s3_path(path):
+        s3_client = get_s3_client()
+
         so_config = Config(
             max_pool_connections=10,
             connect_timeout=60,
             read_timeout=60,
             retries={"max_attempts": 10},
         )
-        so_transport_params = {"client_kwargs": {"config": so_config}}
+        so_transport_params = {"client_kwargs": {"config": so_config}, "client": s3_client}
 
         return smart_open.open(path, mode, transport_params=so_transport_params, encoding=encoding)
     else:
@@ -90,3 +93,31 @@ def get_file_length_bytes(path: str) -> int:
 
     file_stats = os.stat(path)
     return file_stats.st_size
+
+
+def delete_file(path: str) -> None:
+    """Delete a file from s3 or local disk"""
+    if is_s3_path(path):
+        bucket, s3_path = split_s3_url(path)
+
+        s3_client = get_s3_client()
+        s3_client.delete_object(Bucket=bucket, Key=s3_path)
+    else:
+        os.remove(path)
+
+
+def file_exists(path: str | Path) -> bool:
+    """Get whether a file exists or not"""
+    if is_s3_path(path):
+        s3_client = get_s3_client()
+
+        bucket, key = split_s3_url(path)
+
+        try:
+            s3_client.head_object(Bucket=bucket, Key=key)
+            return True
+        except botocore.exceptions.ClientError:
+            return False
+
+    # Local file system
+    return Path(path).exists()
