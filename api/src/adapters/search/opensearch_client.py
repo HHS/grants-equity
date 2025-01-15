@@ -211,11 +211,14 @@ class SearchClient:
         search_query: dict,
         include_scores: bool = True,
         params: dict | None = None,
+        excludes: list[str] | None = None,
     ) -> SearchResponse:
         if params is None:
             params = {}
 
-        response = self._client.search(index=index_name, body=search_query, params=params)
+        response = self._client.search(
+            index=index_name, body=search_query, params=params, _source_excludes=excludes
+        )
         return SearchResponse.from_opensearch_response(response, include_scores)
 
     def scroll(
