@@ -68,8 +68,6 @@ line-length = 100
 [tool.ruff.lint]
 select = ["ALL"]
 ignore = [
-  "ANN101",  # missing type annotation for self
-  "ANN102",  # missing type annotation for cls
   "D203",    # no blank line before class
   "D212",    # multi-line summary first line
   "FIX002",  # line contains TODO
@@ -78,7 +76,6 @@ ignore = [
   "PTH123",  # `open()` should be replaced by `Path.open()`
   "RUF012",  # Mutable class attributes should be annotated with `typing.ClassVar`
   "TD003",   # missing an issue link on TODO
-  "PT004",   # pytest fixture leading underscore - is marked deprecated
   "FA102",   # Adding "from __future__ import annotations" to any new-style type annotation
 ]
 

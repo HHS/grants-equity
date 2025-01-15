@@ -18,7 +18,6 @@ RUN apt-get update \
     libpq-dev \
     postgresql \
     wget \
-    jq \
   # Install security updates
   # https://pythonspeed.com/articles/security-updates-in-docker/
   && apt-get upgrade --yes \
@@ -28,23 +27,10 @@ RUN apt-get update \
     libpq-dev \
     postgresql \
     wget \
-    jq \
   # Reduce the image size by clear apt cached lists
   # Complies with https://github.com/codacy/codacy-hadolint/blob/master/codacy-hadolint/docs/description/DL3009.md
   && rm -fr /var/lib/apt/lists/* \
   && rm /etc/ssl/private/ssl-cert-snakeoil.key
-
-# Install gh CLI
-# docs: https://github.com/cli/cli/blob/trunk/docs/install_linux.md
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
-RUN mkdir -p /etc/apt/keyrings \
-  && wget -qO- https://cli.github.com/packages/githubcli-archive-keyring.gpg | tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
-  && chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-  && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-  && apt-get update \
-  && apt-get install gh -y \
-  && rm -fr /var/lib/apt/lists/* \
-  && gh --version
 
 ARG RUN_UID
 ARG RUN_USER

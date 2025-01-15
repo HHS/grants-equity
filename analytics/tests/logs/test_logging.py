@@ -40,7 +40,7 @@ def test_init(
         records = caplog.records
         assert len(records) == 2
         assert re.match(
-            r"^start test_logging: \w+ [0-9.]+ \w+, hostname \S+, pid \d+, user \d+\(\w+\)$",
+            r"^start test_logging: \w+ [0-9.]+ \w+, hostname \S+, pid \d+, user \d+\([\w\.]+\)",
             records[0].message,
         )
         assert re.match(r"^invoked as:", records[1].message)

@@ -101,6 +101,7 @@ class GitHubProjectETL:
         self.config = config
         # Declare private attributes shared across ETL steps
         self._transient_files: list[InputFiles]
+        self.client = github.GitHubGraphqlClient()
         self.dataset: GitHubIssues
 
     def run(self) -> None:
@@ -121,7 +122,8 @@ class GitHubProjectETL:
             output_file=roadmap_file,
         )
 
-        # Export sprint data
+        # Export sprint data for each GitHub project that the scrum teams use
+        # to manage their sprints, e.g. HHS/17 and HHS/13
         input_files: list[InputFiles] = []
         for sprint_board in self.config.sprint_projects:
             project = sprint_board.project_number
@@ -167,6 +169,7 @@ class GitHubProjectETL:
         )
         # Export the data
         github.export_roadmap_data(
+            client=self.client,
             owner=roadmap.owner,
             project=roadmap.project_number,
             quad_field=roadmap.quad_field,
@@ -186,6 +189,7 @@ class GitHubProjectETL:
             sprint_board.project_number,
         )
         github.export_sprint_data(
+            client=self.client,
             owner=sprint_board.owner,
             project=sprint_board.project_number,
             sprint_field=sprint_board.sprint_field,
@@ -201,6 +205,8 @@ class GitHubProjectETL:
 
 def run_transformation_pipeline(files: InputFiles) -> list[dict]:
     """Load data from input files and apply transformations."""
+    # Log the current sprint for which we're running the transformations
+    logger.info("Running transformations for sprint: %s", files.sprint)
     # Load sprint and roadmap data
     sprint_data_in = load_json_file(files.sprint)
     roadmap_data_in = load_json_file(files.roadmap)
