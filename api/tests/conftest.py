@@ -88,7 +88,9 @@ def upload_opportunity_attachment_s3(reset_aws_env_vars, mock_s3_bucket):
         for file in files:
             file_path = os.path.join(root, file)
             s3_client.upload_file(
-                file_path, Bucket=mock_s3_bucket, Key=os.path.relpath(file_path, test_folder_path)
+                file_path,
+                Bucket=mock_s3_bucket,
+                Key=os.path.relpath(file_path, test_folder_path),
             )
 
     # Check files were uploaded to mock s3

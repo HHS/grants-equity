@@ -1,7 +1,9 @@
+import base64
 import logging
 from enum import StrEnum
 from typing import Iterator, Sequence
 
+import smart_open
 from opensearchpy.exceptions import ConnectionTimeout, TransportError
 from pydantic import Field
 from pydantic_settings import SettingsConfigDict
@@ -16,6 +18,7 @@ from src.db.models.agency_models import Agency
 from src.db.models.opportunity_models import (
     CurrentOpportunitySummary,
     Opportunity,
+    OpportunityAttachment,
     OpportunitySearchIndexQueue,
 )
 from src.task.task import Task
@@ -36,6 +39,10 @@ class LoadOpportunitiesToIndexConfig(PydanticBaseEnvConfig):
     alias_name: str = Field(default="opportunity-index-alias")  # LOAD_OPP_SEARCH_ALIAS_NAME
     index_prefix: str = Field(default="opportunity-index")  # LOAD_OPP_INDEX_PREFIX
 
+    enable_opportunity_attachment_pipeline: bool = Field(
+        default=False, alias="ENABLE_OPPORTUNITY_ATTACHMENT_PIPELINE"
+    )
+
 
 class LoadOpportunitiesToIndex(Task):
     class Metrics(StrEnum):
@@ -53,7 +60,6 @@ class LoadOpportunitiesToIndex(Task):
 
         self.search_client = search_client
         self.is_full_refresh = is_full_refresh
-
         if config is None:
             config = LoadOpportunitiesToIndexConfig()
         self.config = config
@@ -269,6 +275,31 @@ class LoadOpportunitiesToIndex(Task):
 
         return opportunity_ids
 
+    def filter_attachments(
+        self, attachments: list[OpportunityAttachment]
+    ) -> list[OpportunityAttachment]:
+        return [attachment for attachment in attachments]
+
+    def get_attachment_json_for_opportunity(
+        self, opp_attachments: list[OpportunityAttachment]
+    ) -> list[dict]:
+
+        attachments = []
+        for att in opp_attachments:
+            with smart_open.open(
+                att.file_location,
+                "rb",
+            ) as file:
+                file_content = file.read()
+                attachments.append(
+                    {
+                        "filename": att.file_name,
+                        "data": base64.b64encode(file_content).decode("utf-8"),
+                    }
+                )
+
+        return attachments
+
     @retry(
         stop=stop_after_attempt(3),  # Retry up to 3 times
         wait=wait_fixed(2),  # Wait 2 seconds between retries
@@ -300,11 +331,19 @@ class LoadOpportunitiesToIndex(Task):
                 self.increment(self.Metrics.TEST_RECORDS_SKIPPED)
                 continue
 
-            json_records.append(schema.dump(record))
+            json_record = schema.dump(record)
+            if self.config.enable_opportunity_attachment_pipeline:
+                json_record["attachments"] = self.get_attachment_json_for_opportunity(
+                    record.opportunity_attachments
+                )
+
+            json_records.append(json_record)
             self.increment(self.Metrics.RECORDS_LOADED)
 
             loaded_opportunity_ids.add(record.opportunity_id)
 
-        self.search_client.bulk_upsert(self.index_name, json_records, "opportunity_id")
+        self.search_client.bulk_upsert(
+            self.index_name, json_records, "opportunity_id", pipeline="multi-attachment"
+        )
 
         return loaded_opportunity_ids

@@ -94,6 +94,7 @@ class SearchClient:
         primary_key_field: str,
         *,
         refresh: bool = True,
+        pipeline: str | None = None,
     ) -> None:
         """
         Bulk upsert records to an index
@@ -124,7 +125,11 @@ class SearchClient:
                 "operation": "update",
             },
         )
-        self._client.bulk(index=index_name, body=bulk_operations, refresh=refresh)
+        bulk_args = {"index": index_name, "body": bulk_operations, "refresh": refresh}
+        if pipeline:
+            bulk_args["pipeline"] = pipeline
+
+        self._client.bulk(**bulk_args)
 
     def bulk_delete(self, index_name: str, ids: Iterable[Any], *, refresh: bool = True) -> None:
         """

@@ -51,7 +51,6 @@ def test_bulk_upsert(search_client, generic_index):
     ]
 
     search_client.bulk_upsert(generic_index, records, primary_key_field="id")
-
     # Verify the records are in the index
     for record in records:
         assert search_client._client.get(generic_index, record["id"])["_source"] == record
