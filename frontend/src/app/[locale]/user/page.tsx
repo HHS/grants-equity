@@ -27,8 +27,8 @@ export async function generateMetadata({
 export default async function UserDisplay({
   searchParams,
   params
-}: LocalizedPageProps & { searchParams: { message?: string } }) {
-  const { message } = searchParams;
+}: LocalizedPageProps & { searchParams: Promise<{ message?: string }> }) {
+  const { message } = await searchParams;
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "User" });
 
