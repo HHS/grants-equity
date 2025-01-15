@@ -6,9 +6,8 @@ import { GridContainer } from "@trussworks/react-uswds";
 
 import { LogoutButton } from "./LogoutButton";
 
-export async function generateMetadata({
-  params: { locale },
-}: LocalizedPageProps) {
+export async function generateMetadata({ params }: LocalizedPageProps) {
+  const { locale } = await params;
   const t = await getTranslations({ locale });
   const meta: Metadata = {
     title: t("User.pageTitle"),
@@ -25,11 +24,12 @@ export async function generateMetadata({
 // response in the client.
 export default async function UserDisplay({
   searchParams,
-  params: { locale },
-}: LocalizedPageProps & { searchParams: { message?: string } }) {
-  const { message } = searchParams;
-
+  params,
+}: LocalizedPageProps & { searchParams: Promise<{ message?: string }> }) {
+  const { message } = await searchParams;
+  const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "User" });
+
   return (
     <GridContainer>
       <h1>{t("heading")}</h1>

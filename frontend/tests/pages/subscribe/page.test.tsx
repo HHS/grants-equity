@@ -2,7 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { axe } from "jest-axe";
 import { identity } from "lodash";
 import Subscribe from "src/app/[locale]/subscribe/page";
-import { useTranslationsMock } from "src/utils/testing/intlMocks";
+import { localeParams, useTranslationsMock } from "src/utils/testing/intlMocks";
 
 jest.mock("react-dom", () => {
   const originalModule =
@@ -41,7 +41,7 @@ jest.mock("next-intl/server", () => ({
 
 describe("Subscribe", () => {
   it("renders intro text", () => {
-    render(Subscribe({ params: { locale: "en" } }));
+    render(Subscribe({ params: localeParams }));
 
     const content = screen.getByText("intro");
 
@@ -49,7 +49,7 @@ describe("Subscribe", () => {
   });
 
   it("passes accessibility scan", async () => {
-    const { container } = render(Subscribe({ params: { locale: "en" } }));
+    const { container } = render(Subscribe({ params: localeParams }));
     const results = await waitFor(() => axe(container));
 
     expect(results).toHaveNoViolations();

@@ -21,6 +21,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
     locale = defaultLocale;
   }
   return {
+    locale,
     formats,
     messages: await getMessagesWithFallbacks(locale),
     timeZone,

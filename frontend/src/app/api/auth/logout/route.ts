@@ -14,7 +14,7 @@ export async function POST() {
       throw new Error("No logout response from API");
     }
     // delete session from current cookies
-    deleteSession();
+    await deleteSession();
     return Response.json({ message: "logout success" });
   } catch (e) {
     const error = e as Error;

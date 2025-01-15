@@ -13,7 +13,7 @@ export enum Breakpoints {
 }
 
 export type WithFeatureFlagProps = {
-  searchParams: ServerSideSearchParams;
+  searchParams: Promise<ServerSideSearchParams>;
 };
 
 export interface ErrorProps {

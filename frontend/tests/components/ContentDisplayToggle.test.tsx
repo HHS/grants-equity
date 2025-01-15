@@ -73,6 +73,7 @@ describe("ContentDisplayToggle", () => {
   // this test is basically useless, as it is only asserting that classes are being applied
   // all of these tests are not great, but it seems that uswds styling is not being loaded by
   // testing library / jsdom, so the ability to test based on actual user facing visibility is heavily limited
+  // eslint-disable-next-line jest/no-disabled-tests
   it.skip("Toggles responds by hiding button and displaying content above passed breakpoint", () => {
     render(
       <ContentDisplayToggle
