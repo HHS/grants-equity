@@ -26,7 +26,7 @@ export default async function SearchPaginationFetch({
   return (
     <>
       <SearchPagination
-        total={totalPages}
+        totalPages={totalPages}
         page={page}
         query={query}
         scroll={scroll}

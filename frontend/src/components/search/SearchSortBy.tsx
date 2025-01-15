@@ -1,11 +1,9 @@
 "use client";
 
-import { QueryContext } from "src/app/[locale]/search/QueryProvider";
 import { useSearchParamUpdater } from "src/hooks/useSearchParamUpdater";
 import { SortOption } from "src/types/search/searchRequestTypes";
 
 import { useTranslations } from "next-intl";
-import { useContext } from "react";
 import { Select } from "@trussworks/react-uswds";
 
 interface SearchSortByProps {
@@ -14,13 +12,8 @@ interface SearchSortByProps {
   totalResults: string;
 }
 
-export default function SearchSortBy({
-  queryTerm,
-  sortby,
-  totalResults,
-}: SearchSortByProps) {
+export default function SearchSortBy({ queryTerm, sortby }: SearchSortByProps) {
   const { updateQueryParams } = useSearchParamUpdater();
-  const { updateTotalResults } = useContext(QueryContext);
   const t = useTranslations("Search");
 
   const SORT_OPTIONS: SortOption[] = [
@@ -54,7 +47,6 @@ export default function SearchSortBy({
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const newValue = event.target.value;
-    updateTotalResults(totalResults);
     updateQueryParams(newValue, "sortby", queryTerm);
   };
 
