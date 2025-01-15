@@ -27,26 +27,27 @@ export async function generateMetadata({ params }: LocalizedPageProps) {
   return meta;
 }
 type SearchPageProps = {
-  searchParams: SearchParamsTypes;
+  searchParams: Promise<SearchParamsTypes>;
   params: Promise<{ locale: string }>;
 };
 
 function Search({ searchParams, params }: SearchPageProps) {
   const { locale } = use(params);
+  const searchParamsRead = use(searchParams);
   setRequestLocale(locale);
   const t = useTranslations("Search");
 
-  const convertedSearchParams = convertSearchParamsToProperTypes(searchParams);
+  const convertedSearchParams = convertSearchParamsToProperTypes(searchParamsRead);
   const { agency, category, eligibility, fundingInstrument, query, status } =
     convertedSearchParams;
 
-  if (!("page" in searchParams)) {
-    searchParams.page = "1";
+  if (!("page" in searchParamsRead)) {
+    searchParamsRead.page = "1";
   }
 
   return (
     <>
-      <SearchAnalytics params={searchParams} />
+      <SearchAnalytics params={searchParamsRead} />
       <QueryProvider>
         <div className="grid-container">
           <div className="search-bar">
