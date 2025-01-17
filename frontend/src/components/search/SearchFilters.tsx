@@ -1,14 +1,44 @@
-import { useTranslations } from "next-intl";
+import { getAgenciesForFilterOptions } from "src/services/fetch/fetchers/agenciesFetcher";
 
-import SearchFilterAccordion from "src/components/search/SearchFilterAccordion/SearchFilterAccordion";
+import { useTranslations } from "next-intl";
+import { Suspense } from "react";
+import { Accordion } from "@trussworks/react-uswds";
+
+import SearchFilterAccordion, {
+  FilterAccordionProps,
+  FilterOption,
+} from "src/components/search/SearchFilterAccordion/SearchFilterAccordion";
 import {
-  agencyOptions,
+  // agencyOptions,
   categoryOptions,
   eligibilityOptions,
   fundingOptions,
 } from "src/components/search/SearchFilterAccordion/SearchFilterOptions";
 import SearchOpportunityStatus from "src/components/search/SearchOpportunityStatus";
 
+interface FetchedOptionsFilterAccordionProps extends FilterAccordionProps {
+  filterOptionsPromise: Promise<FilterOption[]>;
+}
+
+// async component used to handle fetching agencies
+export async function FetchedOptionsFilterAccordion({
+  filterOptionsPromise,
+  title,
+  queryParamKey,
+  query,
+}: FetchedOptionsFilterAccordionProps) {
+  const filterOptions = await filterOptionsPromise;
+  return (
+    <SearchFilterAccordion
+      filterOptions={filterOptions}
+      query={query}
+      queryParamKey={queryParamKey}
+      title={title}
+    />
+  );
+}
+
+// TODO: disabled styling for suspended component
 export default function SearchFilters({
   fundingInstrument,
   eligibility,
@@ -23,6 +53,7 @@ export default function SearchFilters({
   opportunityStatus: Set<string>;
 }) {
   const t = useTranslations("Search");
+  const agenciesPromise = getAgenciesForFilterOptions();
 
   return (
     <>
@@ -39,12 +70,37 @@ export default function SearchFilters({
         queryParamKey={"eligibility"}
         title={t("accordion.titles.eligibility")}
       />
-      <SearchFilterAccordion
-        filterOptions={agencyOptions}
-        query={agency}
-        queryParamKey={"agency"}
-        title={t("accordion.titles.agency")}
-      />
+      <Suspense
+        fallback={
+          <Accordion
+            bordered={true}
+            items={[
+              {
+                title: `${t("accordion.titles.agency")}`,
+                content: [],
+                expanded: false,
+                id: `opportunity-filter-agency-disabled`,
+                headingLevel: "h2",
+              },
+            ]}
+            multiselectable={true}
+            className="margin-top-4"
+          />
+        }
+      >
+        <FetchedOptionsFilterAccordion
+          filterOptionsPromise={agenciesPromise}
+          query={agency}
+          queryParamKey={"agency"}
+          title={t("accordion.titles.agency")}
+        />
+        {/* <SearchFilterAccordion
+          filterOptions={[]}
+          query={agency}
+          queryParamKey={"agency"}
+          title={t("accordion.titles.agency")}
+        /> */}
+      </Suspense>
       <SearchFilterAccordion
         filterOptions={categoryOptions}
         query={category}

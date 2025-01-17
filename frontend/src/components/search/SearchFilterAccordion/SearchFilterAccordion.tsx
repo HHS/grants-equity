@@ -29,11 +29,14 @@ export interface FilterOption {
   value: string;
 }
 
-export interface SearchFilterAccordionProps {
-  filterOptions: FilterOption[];
+export interface FilterAccordionProps {
   query: Set<string>;
   queryParamKey: QueryParamKey; // Ex - In query params, search?{key}=first,second,third
   title: string; // Title in header of accordion
+}
+
+export interface SearchFilterAccordionProps extends FilterAccordionProps {
+  filterOptions: FilterOption[];
 }
 
 export interface FilterOptionWithChildren {
