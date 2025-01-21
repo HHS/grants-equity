@@ -26,7 +26,7 @@ export default function SearchFilters({
 }) {
   const t = useTranslations("Search");
   const agenciesPromise = getAgenciesForFilterOptions();
-  // console.log("!!! render", agency, agenciesPromise);
+
   return (
     <>
       <SearchOpportunityStatus query={opportunityStatus} />
