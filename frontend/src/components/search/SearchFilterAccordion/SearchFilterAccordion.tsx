@@ -3,6 +3,7 @@
 import { camelCase } from "lodash";
 import { QueryContext } from "src/app/[locale]/search/QueryProvider";
 import { useSearchParamUpdater } from "src/hooks/useSearchParamUpdater";
+import { useGlobalState } from "src/services/globalState/GlobalStateProvider";
 import { QueryParamKey } from "src/types/search/searchResponseTypes";
 
 import { useContext } from "react";
@@ -66,6 +67,13 @@ export function SearchFilterAccordion({
 }: SearchFilterAccordionProps) {
   const { queryTerm } = useContext(QueryContext);
   const { updateQueryParams, searchParams } = useSearchParamUpdater();
+  const { setAgencyOptions } = useGlobalState(({ setAgencyOptions }) => ({
+    setAgencyOptions,
+  }));
+
+  if (queryParamKey === "agency" && filterOptions) {
+    setAgencyOptions(filterOptions);
+  }
 
   const totalCheckedCount = query.size;
   // all top level selectable filter options

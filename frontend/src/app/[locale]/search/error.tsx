@@ -1,10 +1,12 @@
 "use client";
 
 import QueryProvider from "src/app/[locale]/search/QueryProvider";
+import { useGlobalState } from "src/services/globalState/GlobalStateProvider";
 import { FrontendErrorDetails } from "src/types/apiResponseTypes";
 import { ServerSideSearchParams } from "src/types/searchRequestURLTypes";
 import { Breakpoints, ErrorProps } from "src/types/uiTypes";
 import { convertSearchParamsToProperTypes } from "src/utils/search/convertSearchParamsToProperTypes";
+import { isvalidj }
 
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
@@ -13,7 +15,14 @@ import { Alert } from "@trussworks/react-uswds";
 
 import ContentDisplayToggle from "src/components/ContentDisplayToggle";
 import SearchBar from "src/components/search/SearchBar";
-import SearchFilters from "src/components/search/SearchFilters";
+import { AgencyFilterAccordion } from "src/components/search/SearchFilterAccordion/AgencyFilterAccordion";
+import SearchFilterAccordion from "src/components/search/SearchFilterAccordion/SearchFilterAccordion";
+import {
+  categoryOptions,
+  eligibilityOptions,
+  fundingOptions,
+} from "src/components/search/SearchFilterAccordion/SearchFilterOptions";
+import SearchOpportunityStatus from "src/components/search/SearchOpportunityStatus";
 import ServerErrorAlert from "src/components/ServerErrorAlert";
 
 export interface ParsedError {
@@ -22,6 +31,15 @@ export interface ParsedError {
   status: number;
   type: string;
   details?: FrontendErrorDetails;
+}
+
+function isValidJSON(str: string) {
+  try {
+    JSON.parse(str);
+    return true;
+  } catch (e) {
+    return false; // String is not valid JSON
+  }
 }
 
 /*
@@ -35,20 +53,38 @@ export interface ParsedError {
   - - we'll also need to restructure the filters to support pulling from local storage instead of the API (since we just pass a promise containing the agencies down, maybe it's enough to make how we create that promise more flexible)
 */
 
+// note that the SearchFilters component is not used since it is a server component
+// we work around that by including the rendered components from SearchFilters, but manually
+// passing through the agency options as received from global state rather than fetching from API
 export default function SearchError({ error }: ErrorProps) {
   const t = useTranslations("Search");
 
   const searchParams = useSearchParams();
+  useEffect(() => {
+    console.error(error);
+  }, [error]);
+
+  // const { agencyOptions } = useMemo(
+  //   () =>
+  //     useGlobalState(({ agencyOptions }) => ({
+  //       agencyOptions,
+  //     })),
+  //   [],
+  // );
+
+  const parsedErrorData = isValidJSON(error.message) ? JSON.parse(error.message) : {}
+
+  const { agencyOptions } = useGlobalState(({ agencyOptions }) => ({
+    agencyOptions,
+  }));
+
+  // const agencyOptions = [];
   const convertedSearchParams = convertSearchParamsToProperTypes(
     Object.fromEntries(searchParams.entries().toArray()),
   );
 
   const { agency, category, eligibility, fundingInstrument, query, status } =
     convertedSearchParams;
-
-  useEffect(() => {
-    console.error(error);
-  }, [error]);
 
   // note that the validation error will contain untranslated strings
   const ErrorAlert =
@@ -68,19 +104,35 @@ export default function SearchError({ error }: ErrorProps) {
         </div>
         <div className="grid-row grid-gap">
           <div className="tablet:grid-col-4">
-            {/* <ContentDisplayToggle
+            <ContentDisplayToggle
               showCallToAction={t("filterDisplayToggle.showFilters")}
               hideCallToAction={t("filterDisplayToggle.hideFilters")}
               breakpoint={Breakpoints.TABLET}
             >
-              <SearchFilters
-                opportunityStatus={status}
-                eligibility={eligibility}
-                category={category}
-                fundingInstrument={fundingInstrument}
-                agency={agency}
+              <SearchOpportunityStatus query={status} />
+              <SearchFilterAccordion
+                filterOptions={fundingOptions}
+                query={fundingInstrument}
+                queryParamKey="fundingInstrument"
+                title={t("accordion.titles.funding")}
               />
-            </ContentDisplayToggle> */}
+              <SearchFilterAccordion
+                filterOptions={eligibilityOptions}
+                query={eligibility}
+                queryParamKey={"eligibility"}
+                title={t("accordion.titles.eligibility")}
+              />
+              <AgencyFilterAccordion
+                query={agency}
+                agencyOptions={agencyOptions}
+              />
+              <SearchFilterAccordion
+                filterOptions={categoryOptions}
+                query={category}
+                queryParamKey={"category"}
+                title={t("accordion.titles.category")}
+              />
+            </ContentDisplayToggle>
           </div>
           <div className="tablet:grid-col-8">{ErrorAlert}</div>
         </div>

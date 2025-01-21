@@ -66,10 +66,13 @@ export const agenciesToFilterOptions = (
   }, [] as FilterOption[]);
 };
 
-export const getAgenciesForFilterOptions = async (): Promise<
-  FilterOption[]
-> => {
+export const getAgenciesForFilterOptions = async (
+  prefetchedOptions?: FilterOption[],
+): Promise<FilterOption[]> => {
   try {
+    if (prefetchedOptions) {
+      return Promise.resolve(prefetchedOptions);
+    }
     const agencies = await obtainAgencies();
     const filterOptions = agenciesToFilterOptions(agencies);
     return sortFilterOptions(filterOptions);

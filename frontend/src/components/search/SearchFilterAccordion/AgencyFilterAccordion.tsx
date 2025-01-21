@@ -6,15 +6,15 @@ import SearchFilterAccordion, {
   FilterOption,
 } from "src/components/search/SearchFilterAccordion/SearchFilterAccordion";
 
-// this could be abstracted if we ever want to do this again
-export async function AgencyFilterAccordion({
+async function AgencyFilterAccordionWithFetchedOptions({
   query,
   agenciesPromise,
+  title,
 }: {
   query: Set<string>;
   agenciesPromise: Promise<FilterOption[]>;
+  title: string;
 }) {
-  const t = useTranslations("Search");
   const agencies = await agenciesPromise;
   return (
     <Suspense
@@ -23,7 +23,7 @@ export async function AgencyFilterAccordion({
           bordered={true}
           items={[
             {
-              title: `${t("accordion.titles.agency")}`,
+              title,
               content: [],
               expanded: false,
               id: `opportunity-filter-agency-disabled`,
@@ -39,8 +39,44 @@ export async function AgencyFilterAccordion({
         filterOptions={agencies}
         query={query}
         queryParamKey={"agency"}
-        title={t("accordion.titles.agency")}
+        title={title}
       />
     </Suspense>
+  );
+}
+
+// this could be abstracted if we ever want to do this again
+export function AgencyFilterAccordion({
+  query,
+  agencyOptions,
+  agencyOptionsPromise,
+}: {
+  query: Set<string>;
+  agencyOptions?: FilterOption[];
+  agencyOptionsPromise?: Promise<FilterOption[]>;
+}) {
+  const t = useTranslations("Search");
+  const title = t("accordion.titles.agency");
+  if (agencyOptions) {
+    return (
+      <SearchFilterAccordion
+        filterOptions={agencyOptions}
+        query={query}
+        queryParamKey={"agency"}
+        title={title}
+      />
+    );
+  }
+  if (agencyOptionsPromise) {
+    return (
+      <AgencyFilterAccordionWithFetchedOptions
+        agenciesPromise={agencyOptionsPromise}
+        query={query}
+        title={title}
+      />
+    );
+  }
+  throw new Error(
+    "AgencyFilterAccordion must have either agencyOptions or agencyOptionsPromise prop",
   );
 }

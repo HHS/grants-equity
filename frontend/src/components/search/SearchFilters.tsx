@@ -42,7 +42,10 @@ export default function SearchFilters({
         queryParamKey={"eligibility"}
         title={t("accordion.titles.eligibility")}
       />
-      <AgencyFilterAccordion query={agency} agenciesPromise={agenciesPromise} />
+      <AgencyFilterAccordion
+        query={agency}
+        agencyOptionsPromise={agenciesPromise}
+      />
       <SearchFilterAccordion
         filterOptions={categoryOptions}
         query={category}
