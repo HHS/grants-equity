@@ -9,7 +9,6 @@ import SearchFilterAccordion, {
   FilterOption,
 } from "src/components/search/SearchFilterAccordion/SearchFilterAccordion";
 import {
-  // agencyOptions,
   categoryOptions,
   eligibilityOptions,
   fundingOptions,
@@ -94,12 +93,6 @@ export default function SearchFilters({
           queryParamKey={"agency"}
           title={t("accordion.titles.agency")}
         />
-        {/* <SearchFilterAccordion
-          filterOptions={[]}
-          query={agency}
-          queryParamKey={"agency"}
-          title={t("accordion.titles.agency")}
-        /> */}
       </Suspense>
       <SearchFilterAccordion
         filterOptions={categoryOptions}

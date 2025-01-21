@@ -1,11 +1,11 @@
 import { agencyOptions } from "src/components/search/SearchFilterAccordion/SearchFilterOptions";
 
-export interface AgencyNamyLookup {
+export interface AgencyNameLookup {
   [key: string]: string;
 }
 
 export const generateAgencyNameLookup = () => {
-  const agencyNameLookup: AgencyNamyLookup = {};
+  const agencyNameLookup: AgencyNameLookup = {};
 
   agencyOptions.forEach((agency) => {
     if (agency.children) {

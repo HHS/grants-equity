@@ -1,6 +1,7 @@
 "server only";
 
 import { fetchAgencies } from "src/services/fetch/fetchers/fetchers";
+import { sortFilterOptions } from "src/utils/search/searchUtils";
 
 import { FilterOption } from "src/components/search/SearchFilterAccordion/SearchFilterAccordion";
 
@@ -29,19 +30,16 @@ const obtainAgencies = async (): Promise<RelevantAgencyRecord[]> => {
 export const agenciesToFilterOptions = (
   agencies: RelevantAgencyRecord[],
 ): FilterOption[] => {
-  // this sort can be removed if ZXXXX is done and we make a change to do this sort on the API side
-  const alphabeticalAgencies = agencies.sort((a, b) =>
-    a.agency_name.localeCompare(b.agency_name),
-  );
-  // this should put all parent agencies at the top of the list
-  const sortedAgencies = alphabeticalAgencies.sort((a, b) => {
+  // this should put all parent agencies at the top of the list to make it simpler to nest
+  const agenciesWithTopLevelAgenciesFloated = agencies.sort((a, b) => {
     // when sub_agency_code == agency_code we know we're dealing with a parent agency
     if (a.sub_agency_code === a.agency_code) {
       return b.sub_agency_code === b.agency_code ? 0 : -1;
     }
     return b.sub_agency_code === b.agency_code ? 1 : 0;
   });
-  return sortedAgencies.reduce((acc, rawAgency) => {
+
+  return agenciesWithTopLevelAgenciesFloated.reduce((acc, rawAgency) => {
     const agencyOption = {
       id: rawAgency.agency_code,
       label: rawAgency.agency_name,
@@ -73,7 +71,8 @@ export const getAgenciesForFilterOptions = async (): Promise<
 > => {
   try {
     const agencies = await obtainAgencies();
-    return agenciesToFilterOptions(agencies);
+    const filterOptions = agenciesToFilterOptions(agencies);
+    return sortFilterOptions(filterOptions);
   } catch (e) {
     console.error("Error fetching agencies", e);
     return [];
