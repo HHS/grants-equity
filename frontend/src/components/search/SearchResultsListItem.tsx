@@ -2,14 +2,14 @@
 
 import { Opportunity } from "src/types/search/searchResponseTypes";
 import { formatDate } from "src/utils/dateUtil";
-import { AgencyNamyLookup } from "src/utils/search/generateAgencyNameLookup";
+import { AgencyNameLookup } from "src/utils/search/generateAgencyNameLookup";
 
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 
 interface SearchResultsListItemProps {
   opportunity: Opportunity;
-  agencyNameLookup?: AgencyNamyLookup;
+  agencyNameLookup?: AgencyNameLookup;
 }
 
 export default function SearchResultsListItem({

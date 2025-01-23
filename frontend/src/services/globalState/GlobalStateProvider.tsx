@@ -64,5 +64,5 @@ export const useGlobalState = <T extends Partial<GlobalState>>(
     throw new Error("useGlobalState must be used within GlobalStateProvider");
   }
 
-  return useStore(globalStateStore, useShallow(selector)) as T;
+  return useStore(globalStateStore, useShallow(selector));
 };

@@ -1,4 +1,3 @@
-import { deepStrictEqual } from "assert";
 import {
   agenciesToFilterOptions,
   getAgenciesForFilterOptions,
@@ -39,11 +38,11 @@ const mockfetchAgencies = jest
 const mockSortFilterOptions = jest.fn();
 
 jest.mock("src/services/fetch/fetchers/fetchers", () => ({
-  fetchAgencies: (arg: unknown) => mockfetchAgencies(arg),
+  fetchAgencies: (arg: unknown): unknown => mockfetchAgencies(arg),
 }));
 
 jest.mock("src/utils/search/searchUtils", () => ({
-  sortFilterOptions: (arg: unknown) => mockSortFilterOptions(arg),
+  sortFilterOptions: (arg: unknown): unknown => mockSortFilterOptions(arg),
 }));
 
 describe("obtainAgencies", () => {

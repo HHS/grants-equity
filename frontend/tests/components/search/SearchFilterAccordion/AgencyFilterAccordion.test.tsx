@@ -14,13 +14,13 @@ jest.mock("next-intl", () => ({
 jest.mock("src/hooks/useSearchParamUpdater", () => ({
   useSearchParamUpdater: () => ({
     searchParams: new ReadonlyURLSearchParams(),
-    updateQueryParams: () => {},
+    updateQueryParams: () => undefined,
   }),
 }));
 
 jest.mock("src/services/globalState/GlobalStateProvider", () => ({
   useGlobalState: () => ({
-    setAgencyOptions: () => {},
+    setAgencyOptions: () => undefined,
   }),
 }));
 
