@@ -5,7 +5,7 @@ import { sortFilterOptions } from "src/utils/search/searchUtils";
 
 import { FilterOption } from "src/components/search/SearchFilterAccordion/SearchFilterAccordion";
 
-interface RelevantAgencyRecord {
+export interface RelevantAgencyRecord {
   agency_code: string;
   agency_id: number;
   agency_name: string;
@@ -13,7 +13,7 @@ interface RelevantAgencyRecord {
 }
 
 // would have called this getAgencies, but technically it's a POST
-const obtainAgencies = async (): Promise<RelevantAgencyRecord[]> => {
+export const obtainAgencies = async (): Promise<RelevantAgencyRecord[]> => {
   const response = await fetchAgencies({
     body: {
       pagination: {
@@ -27,6 +27,7 @@ const obtainAgencies = async (): Promise<RelevantAgencyRecord[]> => {
   return response.data as RelevantAgencyRecord[];
 };
 
+// translates API response containing flat list of agencies into nested filter options
 export const agenciesToFilterOptions = (
   agencies: RelevantAgencyRecord[],
 ): FilterOption[] => {
