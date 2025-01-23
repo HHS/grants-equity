@@ -8,27 +8,24 @@ import { createContext, useContext, useRef, type ReactNode } from "react";
 
 import { FilterOption } from "src/components/search/SearchFilterAccordion/SearchFilterAccordion";
 
-export type GlobalStateItems = {
+type GlobalStateItems = {
   agencyOptions: FilterOption[];
 };
 
-export type GlobalStateActions = {
+type GlobalStateActions = {
   setAgencyOptions: (options: FilterOption[]) => void;
 };
 
 // can break this into items vs actions if it gets too big
-export type GlobalState = {
-  agencyOptions: FilterOption[];
-  setAgencyOptions: (options: FilterOption[]) => void;
-};
+type GlobalState = GlobalStateItems & GlobalStateActions;
 
-export type GlobalStore = StoreApi<GlobalState>;
+type GlobalStore = StoreApi<GlobalState>;
 
-export const defaultInitState: GlobalStateItems = {
+const defaultInitState: GlobalStateItems = {
   agencyOptions: [],
 };
 
-export const createGlobalStore = (initState = defaultInitState) => {
+const createGlobalStore = (initState = defaultInitState) => {
   return createStore<GlobalState>()((set) => ({
     ...initState,
     setAgencyOptions: (agencyOptions: FilterOption[]) =>
@@ -36,11 +33,9 @@ export const createGlobalStore = (initState = defaultInitState) => {
   }));
 };
 
-export const GlobalStateContext = createContext<GlobalStore | undefined>(
-  undefined,
-);
+const GlobalStateContext = createContext<GlobalStore | undefined>(undefined);
 
-export interface GlobalStateProviderProps {
+interface GlobalStateProviderProps {
   children: ReactNode;
 }
 

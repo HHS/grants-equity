@@ -17,35 +17,18 @@ async function AgencyFilterAccordionWithFetchedOptions({
 }) {
   const agencies = await agenciesPromise;
   return (
-    <Suspense
-      fallback={
-        <Accordion
-          bordered={true}
-          items={[
-            {
-              title,
-              content: [],
-              expanded: false,
-              id: `opportunity-filter-agency-disabled`,
-              headingLevel: "h2",
-            },
-          ]}
-          multiselectable={true}
-          className="margin-top-4"
-        />
-      }
-    >
-      <SearchFilterAccordion
-        filterOptions={agencies}
-        query={query}
-        queryParamKey={"agency"}
-        title={title}
-      />
-    </Suspense>
+    <SearchFilterAccordion
+      filterOptions={agencies}
+      query={query}
+      queryParamKey={"agency"}
+      title={title}
+    />
   );
 }
 
-// this could be abstracted if we ever want to do this again
+// functionality differs depending on whether `agencyOptions` or `agencyOptionsPromise` is passed
+// with prefetched options we have a synchronous render
+// with a Promise we have an async render with Suspense
 export function AgencyFilterAccordion({
   query,
   agencyOptions,
@@ -69,11 +52,30 @@ export function AgencyFilterAccordion({
   }
   if (agencyOptionsPromise) {
     return (
-      <AgencyFilterAccordionWithFetchedOptions
-        agenciesPromise={agencyOptionsPromise}
-        query={query}
-        title={title}
-      />
+      <Suspense
+        fallback={
+          <Accordion
+            bordered={true}
+            items={[
+              {
+                title,
+                content: [],
+                expanded: false,
+                id: `opportunity-filter-agency-disabled`,
+                headingLevel: "h2",
+              },
+            ]}
+            multiselectable={true}
+            className="margin-top-4"
+          />
+        }
+      >
+        <AgencyFilterAccordionWithFetchedOptions
+          agenciesPromise={agencyOptionsPromise}
+          query={query}
+          title={title}
+        />
+      </Suspense>
     );
   }
   throw new Error(

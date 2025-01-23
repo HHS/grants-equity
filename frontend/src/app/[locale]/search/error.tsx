@@ -42,18 +42,7 @@ function isValidJSON(str: string) {
   }
 }
 
-/*
-  - expand the layout to ensure that server side rendering can happen on the agency filter
-  - - problem is that then we would not be able to repopulate the form state on error
-  - mock out the agency list based on hardcoded options
-  - - this just seems like a bad hack, and we have to bloat our payload with bad data
-  - - also the inconsistency would be very confusing
-  - explicitly stash the agency list in local storage and retrieve it here?
-  - - probably creating a local storage provider in the layout is a good idea, and we can use it to store the agency list for use here
-  - - we'll also need to restructure the filters to support pulling from local storage instead of the API (since we just pass a promise containing the agencies down, maybe it's enough to make how we create that promise more flexible)
-*/
-
-// note that the SearchFilters component is not used since it is a server component
+// note that the SearchFilters component is not used here since that is a server component
 // we work around that by including the rendered components from SearchFilters, but manually
 // passing through the agency options as received from global state rather than fetching from API
 export default function SearchError({ error }: ErrorProps) {
@@ -64,21 +53,12 @@ export default function SearchError({ error }: ErrorProps) {
     console.error(error);
   }, [error]);
 
-  // const { agencyOptions } = useMemo(
-  //   () =>
-  //     useGlobalState(({ agencyOptions }) => ({
-  //       agencyOptions,
-  //     })),
-  //   [],
-  // );
-
   const parsedErrorData = isValidJSON(error.message) ? JSON.parse(error.message) : {}
 
   const { agencyOptions } = useGlobalState(({ agencyOptions }) => ({
     agencyOptions,
   }));
 
-  // const agencyOptions = [];
   const convertedSearchParams = convertSearchParamsToProperTypes(
     Object.fromEntries(searchParams.entries().toArray()),
   );
