@@ -6,7 +6,6 @@ import { FrontendErrorDetails } from "src/types/apiResponseTypes";
 import { ServerSideSearchParams } from "src/types/searchRequestURLTypes";
 import { Breakpoints, ErrorProps } from "src/types/uiTypes";
 import { convertSearchParamsToProperTypes } from "src/utils/search/convertSearchParamsToProperTypes";
-import { isvalidj }
 
 import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
@@ -26,10 +25,10 @@ import SearchOpportunityStatus from "src/components/search/SearchOpportunityStat
 import ServerErrorAlert from "src/components/ServerErrorAlert";
 
 export interface ParsedError {
-  message: string;
-  searchInputs: ServerSideSearchParams;
-  status: number;
-  type: string;
+  message?: string;
+  searchInputs?: ServerSideSearchParams;
+  status?: number;
+  type?: string;
   details?: FrontendErrorDetails;
 }
 
@@ -53,7 +52,9 @@ export default function SearchError({ error }: ErrorProps) {
     console.error(error);
   }, [error]);
 
-  const parsedErrorData = isValidJSON(error.message) ? JSON.parse(error.message) : {}
+  const parsedErrorData = isValidJSON(error.message)
+    ? (JSON.parse(error.message) as ParsedError)
+    : {};
 
   const { agencyOptions } = useGlobalState(({ agencyOptions }) => ({
     agencyOptions,
@@ -67,6 +68,7 @@ export default function SearchError({ error }: ErrorProps) {
     convertedSearchParams;
 
   // note that the validation error will contain untranslated strings
+  // and will only appear in development, prod builds will not include user facing error details
   const ErrorAlert =
     parsedErrorData.details && parsedErrorData.type === "ValidationError" ? (
       <Alert type="error" heading={t("validationError")} headingLevel="h4">
