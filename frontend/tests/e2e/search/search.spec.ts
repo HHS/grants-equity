@@ -48,16 +48,16 @@ test.describe("Search page tests", () => {
     };
     const agencyCheckboxes = {
       EPA: "EPA",
-      AC: "AC",
+      NSF: "NSF",
     };
     const categoryCheckboxes = {
       "category-recovery_act": "recovery_act",
       "category-agriculture": "agriculture",
     };
 
-    await selectSortBy(page, "agencyDesc");
-
     await waitForSearchResultsInitialLoad(page);
+    await selectSortBy(page, "agencyDesc");
+    await expectSortBy(page, "agencyDesc");
 
     if (project.name.match(/[Mm]obile/)) {
       await toggleMobileSearchFilters(page);
@@ -71,7 +71,6 @@ test.describe("Search page tests", () => {
       "status",
       "forecasted,posted",
     );
-
     await clickAccordionWithTitle(page, "Funding instrument");
     await toggleCheckboxes(
       page,
@@ -157,6 +156,7 @@ test.describe("Search page tests", () => {
     page,
   }: PageProps) => {
     await page.goto("/search");
+    await waitForSearchResultsInitialLoad(page);
     await selectSortBy(page, "opportunityTitleDesc");
 
     await clickLastPaginationPage(page);
