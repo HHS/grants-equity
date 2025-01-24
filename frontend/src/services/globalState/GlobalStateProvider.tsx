@@ -10,35 +10,49 @@ import { FilterOption } from "src/components/search/SearchFilterAccordion/Search
 
 type GlobalStateItems = {
   agencyOptions: FilterOption[];
+  flattenedAgencyOptions: FilterOption[];
 };
 
 type GlobalStateActions = {
   setAgencyOptions: (options: FilterOption[]) => void;
 };
 
-// can break this into items vs actions if it gets too big
 type GlobalState = GlobalStateItems & GlobalStateActions;
 
 type GlobalStore = StoreApi<GlobalState>;
 
+interface GlobalStateProviderProps {
+  children: ReactNode;
+}
+
 const defaultInitState: GlobalStateItems = {
   agencyOptions: [],
+  flattenedAgencyOptions: [],
+};
+
+// gives us a flattened list of all filter options and children
+const flattenChildren = (options: FilterOption[]): FilterOption[] => {
+  return options.reduce((flattened, option) => {
+    return option.children
+      ? flattened.concat([option, ...option.children])
+      : flattened.concat([option]);
+  }, [] as FilterOption[]);
 };
 
 const createGlobalStore = (initState = defaultInitState) => {
   return createStore<GlobalState>()((set) => ({
     ...initState,
     setAgencyOptions: (agencyOptions: FilterOption[]) =>
-      set(() => ({ agencyOptions })),
+      set(() => ({
+        agencyOptions,
+        flattenedAgencyOptions: flattenChildren(agencyOptions),
+      })),
   }));
 };
 
 const GlobalStateContext = createContext<GlobalStore | undefined>(undefined);
 
-interface GlobalStateProviderProps {
-  children: ReactNode;
-}
-
+// ref usage works around Next JS weirdness - see https://zustand.docs.pmnd.rs/guides/nextjs
 export const GlobalStateProvider = ({ children }: GlobalStateProviderProps) => {
   const storeRef = useRef<GlobalStore>();
   if (!storeRef.current) {
@@ -57,12 +71,13 @@ export const GlobalStateProvider = ({ children }: GlobalStateProviderProps) => {
 export const useGlobalState = <T extends Partial<GlobalState>>(
   selector: (store: GlobalState) => T,
 ): T => {
-  // references the store created and passsed down as value in the provider
+  // references the store created and passed down as value in the provider
   const globalStateStore = useContext(GlobalStateContext);
 
   if (!globalStateStore) {
     throw new Error("useGlobalState must be used within GlobalStateProvider");
   }
 
+  // not sure what useShallow is doing here but it's necessary :shrug:
   return useStore(globalStateStore, useShallow(selector));
 };
