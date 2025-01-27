@@ -1,12 +1,14 @@
 "use client";
 
 import QueryProvider from "src/app/[locale]/search/QueryProvider";
+import { usePrevious } from "src/hooks/usePrevious";
 import { FrontendErrorDetails } from "src/types/apiResponseTypes";
 import { ServerSideSearchParams } from "src/types/searchRequestURLTypes";
 import { Breakpoints, ErrorProps } from "src/types/uiTypes";
 import { convertSearchParamsToProperTypes } from "src/utils/search/convertSearchParamsToProperTypes";
 
 import { useTranslations } from "next-intl";
+import { ReadonlyURLSearchParams, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { Alert } from "@trussworks/react-uswds";
 
@@ -51,8 +53,25 @@ function createBlankParsedError(): ParsedError {
   };
 }
 
-export default function SearchError({ error }: ErrorProps) {
+export default function SearchError({ error, reset }: ErrorProps) {
   const t = useTranslations("Search");
+  const searchParams = useSearchParams();
+  const previousSearchParams =
+    usePrevious<ReadonlyURLSearchParams>(searchParams);
+
+  useEffect(() => {
+    if (
+      reset &&
+      previousSearchParams &&
+      searchParams.toString() !== previousSearchParams?.toString()
+    ) {
+      reset();
+    }
+  }, [searchParams, reset]);
+
+  useEffect(() => {
+    console.error(error);
+  }, [error]);
 
   // The error message is passed as an object that's been stringified.
   // Parse it here.
