@@ -82,6 +82,10 @@ class UserSavedOpportunity(ApiSchemaTable, TimestampMixin):
         BigInteger, ForeignKey(Opportunity.opportunity_id), primary_key=True
     )
 
+    last_notified_at: Mapped[datetime] = mapped_column(
+        default=datetime.utcnow, server_default="NOW()", nullable=False
+    )
+
     user: Mapped[User] = relationship(User, back_populates="saved_opportunities")
     opportunity: Mapped[Opportunity] = relationship(
         "Opportunity", back_populates="saved_opportunities_by_users"
@@ -106,7 +110,9 @@ class UserSavedSearch(ApiSchemaTable, TimestampMixin):
 class UserNotificationLog(ApiSchemaTable, TimestampMixin):
     __tablename__ = "user_notification_log"
 
-    user_notification_log_id: Mapped[uuid.UUID] = mapped_column(UUID, primary_key=True)
+    user_notification_log_id: Mapped[uuid.UUID] = mapped_column(
+        UUID, primary_key=True, default=uuid.uuid4
+    )
 
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey(User.user_id), index=True)
     user: Mapped[User] = relationship(User)
