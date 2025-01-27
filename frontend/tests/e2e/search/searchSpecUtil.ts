@@ -186,14 +186,10 @@ export async function refreshPageWithCurrentURL(page: Page) {
 
 export async function selectSortBy(page: Page, sortByValue: string) {
   await page.locator("#search-sort-by-select").selectOption(sortByValue);
-  await new Promise((resolve) => setTimeout(resolve, 10000));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 }
 
 export async function expectSortBy(page: Page, value: string) {
-  // const selectedValue = await page
-  //   .locator('select[name="search-sort-by"]')
-  //   .inputValue();
-  // expect(selectedValue).toBe(value);
   const sortSelectElement = page.locator('select[name="search-sort-by"]');
   await expect(sortSelectElement).toHaveValue(value);
 }
