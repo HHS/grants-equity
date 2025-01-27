@@ -214,6 +214,8 @@ test.describe("Search page tests", () => {
         // load search page
         await page.goto("/search");
 
+        await waitForSearchResultsInitialLoad(page);
+
         const initialSearchResultsCount =
           await getNumberOfOpportunitySearchResults(page);
 
@@ -301,6 +303,8 @@ test.describe("Search page tests", () => {
         "#opportunity-filter-agency > ul > li:first-child > div > div input";
 
       await page.goto("/search");
+
+      await waitForSearchResultsInitialLoad(page);
 
       const initialSearchResultsCount =
         await getNumberOfOpportunitySearchResults(page);
