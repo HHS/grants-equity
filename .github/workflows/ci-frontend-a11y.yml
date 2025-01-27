@@ -39,7 +39,7 @@ jobs:
       - name: Start API Server for search results
         run: |
           cd ../api
-          make init db-seed-local start &
+          make init db-seed-local populate-search-opportunities start &
           cd ../frontend
           # ensure the API wait script is executable
           chmod +x ../api/bin/wait-for-api.sh
