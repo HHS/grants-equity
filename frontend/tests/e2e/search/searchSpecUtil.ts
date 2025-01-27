@@ -35,22 +35,6 @@ export const generateRandomString = (desiredPattern: number[]) => {
   }, "");
 };
 
-export function expectURLContainsQueryParamValue(
-  page: Page,
-  queryParamName: string,
-  queryParamValue: string,
-  shouldContain = true,
-) {
-  const currentURL = page.url();
-  const queryParam = `${queryParamName}=${queryParamValue}`;
-
-  if (shouldContain) {
-    expect(currentURL).toContain(queryParam);
-  } else {
-    expect(currentURL).not.toContain(queryParam);
-  }
-}
-
 export function expectURLContainsQueryParam(
   page: Page,
   queryParamName: string,

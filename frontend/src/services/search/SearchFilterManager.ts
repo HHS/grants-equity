@@ -13,13 +13,13 @@ export default class SearchFilterManager {
   options: FilterOption[];
   setOptions: React.Dispatch<React.SetStateAction<FilterOption[]>>;
   updateQueryParams: UpdateQueryParamsFunction;
-  formRef: React.RefObject<HTMLFormElement>;
+  formRef: React.RefObject<HTMLFormElement | null>;
 
   constructor(
     options: FilterOption[],
     setOptions: React.Dispatch<React.SetStateAction<FilterOption[]>>,
     updateQueryParams: UpdateQueryParamsFunction,
-    formRef: React.RefObject<HTMLFormElement>,
+    formRef: React.RefObject<HTMLFormElement | null>,
   ) {
     this.options = options;
     this.setOptions = setOptions;

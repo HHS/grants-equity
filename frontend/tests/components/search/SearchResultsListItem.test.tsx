@@ -1,6 +1,6 @@
 import { axe } from "jest-axe";
 import { Opportunity } from "src/types/search/searchResponseTypes";
-import { render, screen } from "tests/react-utils";
+import { render, screen, waitFor } from "tests/react-utils";
 
 import React from "react";
 
@@ -26,7 +26,7 @@ describe("SearchResultsListItem", () => {
     const { container } = render(
       <SearchResultsListItem opportunity={mockOpportunity} />,
     );
-    const results = await axe(container);
+    const results = await waitFor(() => axe(container));
     expect(results).toHaveNoViolations();
   });
 

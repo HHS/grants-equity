@@ -67,8 +67,8 @@ jest.mock("jose", () => ({
 
 describe("deleteSession", () => {
   afterEach(() => jest.clearAllMocks());
-  it("calls cookie.delete with expected values", () => {
-    deleteSession();
+  it("calls cookie.delete with expected values", async () => {
+    await deleteSession();
     expect(deleteCookiesMock).toHaveBeenCalledTimes(1);
     expect(deleteCookiesMock).toHaveBeenCalledWith("session");
   });

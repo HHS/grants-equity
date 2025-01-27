@@ -2,7 +2,7 @@ import { ExternalRoutes } from "src/constants/routes";
 
 import { useMessages, useTranslations } from "next-intl";
 import Link from "next/link";
-import React, { ReactNode } from "react";
+import { ReactNode } from "react";
 import {
   Grid,
   GridContainer,

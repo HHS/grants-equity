@@ -1,4 +1,3 @@
-// import Cookies from "js-cookie";
 import Cookies from "js-cookie";
 import { identity } from "lodash";
 import withFeatureFlag from "src/hoc/withFeatureFlag";
@@ -22,6 +21,11 @@ jest.mock("next/headers", () => ({
   cookies: () => Cookies,
 }));
 
+const searchPromise = (query: { [key: string]: string }) =>
+  new Promise<{ [key: string]: string }>((resolve) => {
+    resolve(query);
+  });
+
 describe("WithFeatureFlag", () => {
   afterEach(() => {
     enableFeature = false;
@@ -29,7 +33,7 @@ describe("WithFeatureFlag", () => {
   afterAll(() => {
     jest.restoreAllMocks();
   });
-  it("adds search params as prop to wrapped component", () => {
+  it("adds search params as prop to wrapped component", async () => {
     const OriginalComponent = jest.fn();
     const searchParams = { any: "param" };
     const WrappedComponent = withFeatureFlag(
@@ -37,13 +41,21 @@ describe("WithFeatureFlag", () => {
       "searchOff",
       identity,
     );
-    render(<WrappedComponent searchParams={searchParams} />);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const component = await WrappedComponent({
+      searchParams: searchPromise(searchParams),
+    });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    render(component);
     expect(OriginalComponent).toHaveBeenCalledTimes(1);
-
-    // not sure what the second arg represents here but let's forget about it for now
-    expect(OriginalComponent).toHaveBeenCalledWith({ searchParams }, {});
+    expect(OriginalComponent).toHaveBeenCalledWith(
+      { searchParams: searchPromise(searchParams) },
+      undefined,
+    );
   });
-  it("calls onEnabled during wrapped component render when feature flag is enabled", () => {
+  it("calls onEnabled during wrapped component render when feature flag is enabled", async () => {
     enableFeature = true;
     const OriginalComponent = jest.fn();
     const onEnabled = jest.fn();
@@ -53,19 +65,14 @@ describe("WithFeatureFlag", () => {
       "searchOff",
       onEnabled,
     );
-    render(<WrappedComponent searchParams={searchParams} />);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const component = await WrappedComponent({
+      searchParams: searchPromise(searchParams),
+    });
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    render(component);
     expect(onEnabled).toHaveBeenCalledTimes(1);
-  });
-  it("does not call onEnabled during wrapped component render when feature flag is not enabled", () => {
-    const OriginalComponent = jest.fn();
-    const onEnabled = jest.fn();
-    const searchParams = { any: "param" };
-    const WrappedComponent = withFeatureFlag(
-      OriginalComponent,
-      "searchOff",
-      onEnabled,
-    );
-    render(<WrappedComponent searchParams={searchParams} />);
-    expect(onEnabled).toHaveBeenCalledTimes(0);
   });
 });

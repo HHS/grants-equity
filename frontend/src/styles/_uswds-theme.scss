@@ -10,7 +10,7 @@ in the form $setting: value,
 @use "uswds-core" with (
   // Disable scary but mostly irrelevant warnings:
   $theme-show-notifications: false,
-
+  $theme-show-compile-warnings: false,
   // Specify USWDS font and image paths.
   // Same paths are successfully used for both Next.js and Storybook.
   $theme-font-path: add-base-path("/uswds/fonts"),
@@ -19,8 +19,7 @@ in the form $setting: value,
   $utilities-use-important: true,
 
   // Layout & grid settings
-  $theme-utility-breakpoints:
-    (
+  $theme-utility-breakpoints: (
       "card": false,
       "card-lg": false,
       "mobile": false,
@@ -85,8 +84,7 @@ in the form $setting: value,
   $theme-lead-font-family: "body",
 
   // Color settings
-  $background-color-palettes:
-    (
+  $background-color-palettes: (
       "palette-color-system-cyan-light",
       "palette-color-system-yellow-light",
       "palette-color-system-green-cool",

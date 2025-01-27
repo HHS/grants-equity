@@ -20,16 +20,17 @@ const withFeatureFlag = <P, R>(
   }
 
   // top level component to grab search params from the top level page props
-  const ComponentWithFeatureFlagAndSearchParams = (
+  const ComponentWithFeatureFlagAndSearchParams = async (
     props: P & WithFeatureFlagProps,
   ) => {
-    const searchParams = props.searchParams || {};
+    const searchParams = (await props.searchParams) || {};
+    const resolvedCookies = await cookies();
     const ComponentWithFeatureFlag = (props: P & WithFeatureFlagProps) => {
       if (
         featureFlagsManager.isFeatureEnabled(
           featureFlagName,
-          cookies(),
-          props.searchParams,
+          resolvedCookies,
+          searchParams,
         )
       ) {
         onEnabled();
@@ -38,7 +39,9 @@ const withFeatureFlag = <P, R>(
 
       return <WrappedComponent {...props} />;
     };
-    return <ComponentWithFeatureFlag {...props} searchParams={searchParams} />;
+    return (
+      <ComponentWithFeatureFlag {...props} searchParams={props.searchParams} />
+    );
   };
 
   return ComponentWithFeatureFlagAndSearchParams;

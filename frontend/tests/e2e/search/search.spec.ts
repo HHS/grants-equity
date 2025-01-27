@@ -7,7 +7,6 @@ import {
   clickPaginationPageNumber,
   expectCheckboxIDIsChecked,
   expectSortBy,
-  expectURLContainsQueryParamValue,
   fillSearchInputAndSubmit,
   getFirstSearchResultTitle,
   getLastSearchResultTitle,
@@ -150,7 +149,7 @@ test.describe("Search page tests", () => {
     await expect(currentPageButton).toHaveAttribute("aria-label", "Page 1");
 
     // It should not have a page query param set
-    expectURLContainsQueryParamValue(page, "page", "1", false);
+    await page.waitForURL("search?status=closed");
   });
 
   test("last result becomes first result when flipping sort order", async ({

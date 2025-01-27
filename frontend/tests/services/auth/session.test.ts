@@ -96,6 +96,7 @@ describe("getSession", () => {
 describe("createSession", () => {
   afterEach(() => jest.clearAllMocks());
   // to get this to work we'd need to manage resetting all modules before the test, which is a bit of a pain
+  // eslint-disable-next-line jest/no-disabled-tests
   it.skip("initializes session secrets if necessary", async () => {
     await createSession("nothingSpecial");
     expect(encodeTextMock).toHaveBeenCalledWith("session secret");

@@ -2,7 +2,18 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { axe } from "jest-axe";
 import { identity } from "lodash";
 import Process from "src/app/[locale]/process/page";
-import { mockMessages, useTranslationsMock } from "src/utils/testing/intlMocks";
+import {
+  localeParams,
+  mockMessages,
+  useTranslationsMock,
+} from "src/utils/testing/intlMocks";
+
+jest.mock("react", () => ({
+  ...jest.requireActual<typeof import("react")>("react"),
+  use: jest.fn(() => ({
+    locale: "en",
+  })),
+}));
 
 jest.mock("next-intl/server", () => ({
   getTranslations: () => identity,
@@ -16,17 +27,14 @@ jest.mock("next-intl", () => ({
 
 describe("Process", () => {
   it("renders intro text", () => {
-    render(Process({ params: { locale: "en" } }));
-
+    render(<Process params={localeParams} />);
     const content = screen.getByText("intro.content");
-
     expect(content).toBeInTheDocument();
   });
 
   it("passes accessibility scan", async () => {
-    const { container } = render(Process({ params: { locale: "en" } }));
+    const { container } = render(<Process params={localeParams} />);
     const results = await waitFor(() => axe(container));
-
     expect(results).toHaveNoViolations();
   });
 });

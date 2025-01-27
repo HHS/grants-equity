@@ -25,6 +25,13 @@ const mockSetFeatureFlag = jest.fn(
   },
 );
 
+jest.mock("react", () => ({
+  ...jest.requireActual<typeof import("react")>("react"),
+  use: jest.fn(() => ({
+    locale: "en",
+  })),
+}));
+
 jest.mock("src/hooks/useFeatureFlags", () => ({
   useFeatureFlags: () => mockUseFeatureFlags(),
 }));

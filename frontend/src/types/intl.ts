@@ -5,4 +5,4 @@ export type TFn =
   | ReturnType<typeof useTranslations<never>>
   | Awaited<ReturnType<typeof getTranslations<never>>>;
 
-export type LocalizedPageProps = { params: { locale: string } };
+export type LocalizedPageProps = { params: Promise<{ locale: string }> };

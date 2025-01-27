@@ -23,7 +23,7 @@ import OpportunityLink from "src/components/opportunity/OpportunityLink";
 import OpportunityStatusWidget from "src/components/opportunity/OpportunityStatusWidget";
 
 type OpportunityListingProps = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 } & WithFeatureFlagProps;
 
 export const revalidate = 600; // invalidate ten minutes
@@ -32,9 +32,9 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({
   params,
 }: {
-  params: { id: string; locale: string };
+  params: Promise<{ id: string; locale: string }>;
 }) {
-  const { id, locale } = params;
+  const { id, locale } = await params;
   const t = await getTranslations({ locale });
   let title = `${t("OpportunityListing.page_title")}`;
   try {
@@ -96,7 +96,8 @@ function emptySummary() {
 }
 
 async function OpportunityListing({ params }: OpportunityListingProps) {
-  const idForParsing = Number(params.id);
+  const { id } = await params;
+  const idForParsing = Number(id);
   const breadcrumbs = Object.assign([], OPPORTUNITY_CRUMBS);
   // Opportunity id needs to be a number greater than 1
   if (isNaN(idForParsing) || idForParsing < 1) {
@@ -105,7 +106,7 @@ async function OpportunityListing({ params }: OpportunityListingProps) {
 
   let opportunityData = {} as Opportunity;
   try {
-    const response = await fetchOpportunity({ subPath: params.id });
+    const response = await fetchOpportunity({ subPath: id });
     opportunityData = response.data;
   } catch (error) {
     if (parseErrorStatus(error as ApiRequestError) === 404) {

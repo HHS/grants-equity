@@ -46,6 +46,7 @@ jobs:
       - name: Start API Server for e2e tests
         run: |
           cd ../api
+          echo "ENABLE_OPPORTUNITY_ATTACHMENT_PIPELINE=false" >> override.env
           make init db-seed-local populate-search-opportunities start &
           cd ../frontend
           # Ensure the API wait script is executable

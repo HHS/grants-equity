@@ -61,7 +61,8 @@ export const createSession = async (token: string) => {
   }
   const expiresAt = newExpirationDate();
   const session = await encrypt(token, expiresAt, clientJwtKey);
-  cookies().set("session", session, {
+  const cookie = await cookies();
+  cookie.set("session", session, {
     httpOnly: true,
     secure: environment.ENVIRONMENT === "prod",
     expires: expiresAt,
@@ -76,9 +77,10 @@ export const getSession = async (): Promise<UserSession | null> => {
   if (!clientJwtKey || !loginGovJwtKey) {
     initializeSessionSecrets();
   }
-  const cookie = cookies().get("session")?.value;
-  if (!cookie) return null;
-  const payload = await decryptClientToken(cookie);
+  const cookie = await cookies();
+  const sessionToken = cookie.get("session")?.value;
+  if (!sessionToken) return null;
+  const payload = await decryptClientToken(sessionToken);
   if (!payload) {
     return null;
   }

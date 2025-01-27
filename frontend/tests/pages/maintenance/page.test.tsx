@@ -2,11 +2,22 @@ import { render, screen, waitFor } from "@testing-library/react";
 import { axe } from "jest-axe";
 import { identity } from "lodash";
 import Maintenance from "src/app/[locale]/maintenance/page";
-import { mockMessages, useTranslationsMock } from "src/utils/testing/intlMocks";
+import {
+  localeParams,
+  mockMessages,
+  useTranslationsMock,
+} from "src/utils/testing/intlMocks";
 
 jest.mock("next-intl/server", () => ({
   getTranslations: () => identity,
   setRequestLocale: identity,
+}));
+
+jest.mock("react", () => ({
+  ...jest.requireActual<typeof import("react")>("react"),
+  use: jest.fn(() => ({
+    locale: "en",
+  })),
 }));
 
 jest.mock("next-intl", () => ({
@@ -16,7 +27,7 @@ jest.mock("next-intl", () => ({
 
 describe("Maintenance", () => {
   it("renders intro text", () => {
-    render(<Maintenance params={{ locale: "en" }} />);
+    render(<Maintenance params={localeParams} />);
 
     const content = screen.getByText("heading");
 
@@ -24,7 +35,7 @@ describe("Maintenance", () => {
   });
 
   it("passes accessibility scan", async () => {
-    const { container } = render(<Maintenance params={{ locale: "en" }} />);
+    const { container } = render(<Maintenance params={localeParams} />);
     const results = await waitFor(() => axe(container));
 
     expect(results).toHaveNoViolations();
