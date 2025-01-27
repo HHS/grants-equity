@@ -190,10 +190,8 @@ export async function selectSortBy(page: Page, sortByValue: string) {
 }
 
 export async function expectSortBy(page: Page, value: string) {
-  const selectedValue = await page
-    .locator('select[name="search-sort-by"]')
-    .inputValue();
-  expect(selectedValue).toBe(value);
+  const sortSelectElement = page.locator('select[name="search-sort-by"]');
+  await expect(sortSelectElement).toHaveValue(value);
 }
 
 export async function waitForSearchResultsInitialLoad(page: Page) {

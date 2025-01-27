@@ -109,13 +109,6 @@ export async function selectSortBy(page: Page, sortByValue: string) {
   await page.locator("#search-sort-by-select").selectOption(sortByValue);
 }
 
-export async function expectSortBy(page: Page, value: string) {
-  const selectedValue = await page
-    .locator('select[name="search-sort-by"]')
-    .inputValue();
-  expect(selectedValue).toBe(value);
-}
-
 export async function waitForSearchResultsLoaded(page: Page) {
   // Wait for number of opportunities to show
   const resultsHeading = page.locator('h2:has-text("Opportunities")');

@@ -2,6 +2,7 @@ import "server-only";
 
 import {
   EndpointConfig,
+  fetchAgenciesEndpoint,
   fetchOpportunityEndpoint,
   opportunitySearchEndpoint,
   userLogoutEndpoint,
@@ -76,3 +77,7 @@ export const fetchOpportunitySearch = requesterForEndpoint<SearchAPIResponse>(
 
 export const postUserLogout =
   requesterForEndpoint<APIResponse>(userLogoutEndpoint);
+
+export const fetchAgencies = requesterForEndpoint<APIResponse>(
+  fetchAgenciesEndpoint,
+);

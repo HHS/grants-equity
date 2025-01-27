@@ -23,8 +23,8 @@ describe("BadRequestError (as an example of other error types)", () => {
     expect(errorData.type).toEqual("BadRequestError");
     expect(errorData.status).toEqual(400);
     expect(errorData.message).toEqual("Test Error");
-    expect(errorData.searchInputs.status).toContain("active");
-    expect(errorData.searchInputs.fundingInstrument).toContain("grant");
+    expect(errorData.searchInputs?.status).toContain("active");
+    expect(errorData.searchInputs?.fundingInstrument).toContain("grant");
   });
 
   it("handles non-Error inputs correctly", () => {

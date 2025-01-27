@@ -3,9 +3,10 @@
 import { camelCase } from "lodash";
 import { QueryContext } from "src/app/[locale]/search/QueryProvider";
 import { useSearchParamUpdater } from "src/hooks/useSearchParamUpdater";
+import { useGlobalState } from "src/services/globalState/GlobalStateProvider";
 import { QueryParamKey } from "src/types/search/searchResponseTypes";
 
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { Accordion } from "@trussworks/react-uswds";
 
 import SearchFilterCheckbox from "src/components/search/SearchFilterAccordion/SearchFilterCheckbox";
@@ -30,10 +31,10 @@ export interface FilterOption {
 }
 
 export interface SearchFilterAccordionProps {
-  filterOptions: FilterOption[];
   query: Set<string>;
   queryParamKey: QueryParamKey; // Ex - In query params, search?{key}=first,second,third
   title: string; // Title in header of accordion
+  filterOptions: FilterOption[];
 }
 
 export interface FilterOptionWithChildren {
@@ -66,6 +67,15 @@ export function SearchFilterAccordion({
 }: SearchFilterAccordionProps) {
   const { queryTerm } = useContext(QueryContext);
   const { updateQueryParams, searchParams } = useSearchParamUpdater();
+  const { setAgencyOptions } = useGlobalState(({ setAgencyOptions }) => ({
+    setAgencyOptions,
+  }));
+
+  useEffect(() => {
+    if (queryParamKey === "agency" && filterOptions && setAgencyOptions) {
+      setAgencyOptions(filterOptions);
+    }
+  }, [queryParamKey, filterOptions, setAgencyOptions]);
 
   const totalCheckedCount = query.size;
   // all top level selectable filter options

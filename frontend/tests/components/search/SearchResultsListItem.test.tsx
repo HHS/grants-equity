@@ -21,6 +21,12 @@ const mockOpportunity: Opportunity = {
   opportunity_number: "OPP-12345",
 } as Opportunity;
 
+jest.mock("src/services/globalState/GlobalStateProvider", () => ({
+  useGlobalState: () => ({
+    flattenedAgencyOptions: [{ id: "hi", label: "yes", value: "sure" }],
+  }),
+}));
+
 describe("SearchResultsListItem", () => {
   it("should not have basic accessibility issues", async () => {
     const { container } = render(

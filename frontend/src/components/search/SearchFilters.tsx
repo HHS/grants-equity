@@ -1,13 +1,15 @@
+import { getAgenciesForFilterOptions } from "src/services/fetch/fetchers/agenciesFetcher";
+
 import { useTranslations } from "next-intl";
 
 import SearchFilterAccordion from "src/components/search/SearchFilterAccordion/SearchFilterAccordion";
 import {
-  agencyOptions,
   categoryOptions,
   eligibilityOptions,
   fundingOptions,
 } from "src/components/search/SearchFilterAccordion/SearchFilterOptions";
 import SearchOpportunityStatus from "src/components/search/SearchOpportunityStatus";
+import { AgencyFilterAccordion } from "./SearchFilterAccordion/AgencyFilterAccordion";
 
 export default function SearchFilters({
   fundingInstrument,
@@ -23,6 +25,7 @@ export default function SearchFilters({
   opportunityStatus: Set<string>;
 }) {
   const t = useTranslations("Search");
+  const agenciesPromise = getAgenciesForFilterOptions();
 
   return (
     <>
@@ -39,11 +42,9 @@ export default function SearchFilters({
         queryParamKey={"eligibility"}
         title={t("accordion.titles.eligibility")}
       />
-      <SearchFilterAccordion
-        filterOptions={agencyOptions}
+      <AgencyFilterAccordion
         query={agency}
-        queryParamKey={"agency"}
-        title={t("accordion.titles.agency")}
+        agencyOptionsPromise={agenciesPromise}
       />
       <SearchFilterAccordion
         filterOptions={categoryOptions}

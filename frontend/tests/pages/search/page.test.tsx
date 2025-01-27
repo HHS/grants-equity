@@ -56,6 +56,12 @@ jest.mock("react", () => ({
   cache: (fn: unknown) => fn,
 }));
 
+jest.mock("src/services/globalState/GlobalStateProvider", () => ({
+  useGlobalState: () => ({
+    agencyOptions: [],
+  }),
+}));
+
 const fetchMock = jest.fn().mockResolvedValue({
   json: jest.fn().mockResolvedValue({ data: [], errors: [], warnings: [] }),
   ok: true,
