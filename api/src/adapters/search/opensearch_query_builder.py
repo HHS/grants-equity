@@ -194,8 +194,19 @@ class SearchQueryBuilder:
         self.filters.append({"range": {field: range_filter}})
         return self
 
+    def adjust_date_format(self, in_date: datetime.date | int | None) -> str:
+        if in_date is None:
+            return None
+        if isinstance(in_date, int):
+            return f"now{in_date:+}d"
+
+        return in_date.isoformat()
+
     def filter_date_range(
-        self, field: str, start_date: datetime.date | None, end_date: datetime.date | None
+        self,
+        field: str,
+        start_date: datetime.date| int | None,
+        end_date: datetime.date | int| None
     ) -> typing.Self:
         """
         For a given field, filter results to a range of dates.
@@ -207,13 +218,19 @@ class SearchQueryBuilder:
         a binary filter on the overall results.
         """
         if start_date is None and end_date is None:
-            raise ValueError("Cannot use date range filter if both start and end are None")
+            raise ValueError(
+                "Cannot use date range filter if both start and end dates are None"
+            )
+
+        start_date_str = self.adjust_date_format(start_date)
+        end_date_str = self.adjust_date_format(end_date)
+
 
         range_filter = {}
-        if start_date is not None:
-            range_filter["gte"] = start_date.isoformat()
-        if end_date is not None:
-            range_filter["lte"] = end_date.isoformat()
+        if start_date_str is not None:
+            range_filter["gte"] = start_date_str
+        if end_date_str is not None:
+            range_filter["lte"] = end_date_str
 
         self.filters.append({"range": {field: range_filter}})
         return self

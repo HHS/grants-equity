@@ -19,3 +19,5 @@ class IntSearchFilter(BaseModel):
 class DateSearchFilter(BaseModel):
     start_date: date | None = None
     end_date: date | None = None
+    start_date_relative: int | None = None
+    end_date_relative: int | None = None

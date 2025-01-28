@@ -1327,6 +1327,18 @@ components:
           - string
           - 'null'
           format: date
+        start_date_relative:
+          type:
+          - integer
+          - 'null'
+          minimum: -1000000
+          maximum: 1000000
+        end_date_relative:
+          type:
+          - integer
+          - 'null'
+          minimum: -1000000
+          maximum: 1000000
     CloseDateFilterV1:
       type: object
       properties:
@@ -1340,6 +1352,18 @@ components:
           - string
           - 'null'
           format: date
+        start_date_relative:
+          type:
+          - integer
+          - 'null'
+          minimum: -1000000
+          maximum: 1000000
+        end_date_relative:
+          type:
+          - integer
+          - 'null'
+          minimum: -1000000
+          maximum: 1000000
     OpportunitySearchFilterV1:
       type: object
       properties:

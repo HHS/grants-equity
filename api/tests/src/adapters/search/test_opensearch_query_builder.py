@@ -390,11 +390,20 @@ class TestOpenSearchQueryBuilder(BaseTestClass):
         "start_date,end_date,expected_results",
         [
             # Date range that will include all results
+            # Absolute
             (date(1900, 1, 1), date(2050, 1, 1), FULL_DATA),
+            # Relative
+            (-45656, 9131, FULL_DATA),
             # Start only date range that will get all results
+            # Absolute
             (date(1950, 1, 1), None, FULL_DATA),
+            # Relative
+            (-45656, None, FULL_DATA),
             # End only date range that will get all results
+            # Absolute
             (None, date(2025, 1, 1), FULL_DATA),
+            # Relative
+            (None, 9131, FULL_DATA),
             # Range that filters to just oldest
             (
                 date(1950, 1, 1),
@@ -402,7 +411,11 @@ class TestOpenSearchQueryBuilder(BaseTestClass):
                 [FELLOWSHIP_OF_THE_RING, TWO_TOWERS, RETURN_OF_THE_KING],
             ),
             # Unbounded range for oldest few
-            (None, date(1990, 1, 1), [FELLOWSHIP_OF_THE_RING, TWO_TOWERS, RETURN_OF_THE_KING]),
+            (
+                None,
+                date(1990, 1, 1),
+                [FELLOWSHIP_OF_THE_RING, TWO_TOWERS, RETURN_OF_THE_KING],
+            ),
             # Unbounded range for newest few
             (date(2011, 8, 1), None, [WORDS_OF_RADIANCE, OATHBRINGER, RHYTHM_OF_WAR]),
             # Selecting a few in the middle
@@ -412,25 +425,38 @@ class TestOpenSearchQueryBuilder(BaseTestClass):
                 [WAY_OF_KINGS, FEAST_FOR_CROWS, DANCE_WITH_DRAGONS],
             ),
             # Exact date
+            # Absolute
             (date(1954, 7, 29), date(1954, 7, 29), [FELLOWSHIP_OF_THE_RING]),
+            # Relative
+            ( -25747, -25747, []),
             # None fetched in range
+            # Absolute
             (date(1981, 1, 1), date(1989, 1, 1), []),
+            # Relative
+            (-16093, -13171, []),
         ],
     )
     def test_query_builder_filter_date_range(
-        self, search_client, search_index, start_date, end_date, expected_results
+        self,
+        search_client,
+        search_index,
+        start_date,
+        end_date,
+        expected_results,
     ):
         builder = (
             SearchQueryBuilder()
             .sort_by([])
-            .filter_date_range("publication_date", start_date, end_date)
+            .filter_date_range(
+                "publication_date", start_date, end_date
+            )
         )
 
-        expected_ranges = {}
+        expected_ranges={}
         if start_date is not None:
-            expected_ranges["gte"] = start_date.isoformat()
+            expected_ranges["gte"] = f"now{start_date:+}d" if isinstance(start_date, int) else start_date.isoformat()
         if end_date is not None:
-            expected_ranges["lte"] = end_date.isoformat()
+            expected_ranges["lte"] = f"now{end_date:+}d" if isinstance(end_date, int) else end_date.isoformat()
 
         expected_query = {
             "size": 25,
@@ -509,7 +535,7 @@ class TestOpenSearchQueryBuilder(BaseTestClass):
         with pytest.raises(ValueError, match="Cannot use int range filter"):
             SearchQueryBuilder().filter_int_range("test_field", None, None)
 
-    def test_filter_date_range_both_none(self):
+    def test_filter_date_range_all_none(self):
         with pytest.raises(ValueError, match="Cannot use date range filter"):
             SearchQueryBuilder().filter_date_range("test_field", None, None)
 
