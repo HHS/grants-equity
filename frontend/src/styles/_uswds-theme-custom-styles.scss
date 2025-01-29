@@ -257,6 +257,14 @@ i.e.
       color: color("gray-70");
     }
   }
+  .grants-spinner {
+    height: units(3);
+    width: units(3);
+    margin: units(0.5);
+    &::after {
+      border-width: 3px;
+    }
+  }
 }
 
 // There is no config for setting the current nav item border color

@@ -1,5 +1,6 @@
 import clsx from "clsx";
 
+import Spinner from "./Spinner";
 import { USWDSIcon } from "./USWDSIcon";
 
 interface SaveButtonProps {
@@ -32,7 +33,7 @@ const SaveButton: React.FC<SaveButtonProps> = ({
     >
       {loading ? (
         <>
-          <USWDSIcon name="loop" /> {loadingText}
+          <Spinner /> {loadingText}
         </>
       ) : (
         <>
