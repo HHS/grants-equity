@@ -238,6 +238,27 @@ i.e.
   padding: units(1) units(2);
 }
 
+.simpler-save-button {
+  padding: units(0.5) units(2) units(0.5) units(1);
+
+  svg {
+    font-size: 2rem;
+  }
+  &--saved {
+    svg {
+      color: color("orange-40v");
+    }
+  }
+  &--loading:disabled {
+    color: color("gray-70");
+    border-color: color("gray-70");
+    box-shadow: inset 0 0 0 2px color("gray-70");
+    svg {
+      color: color("gray-70");
+    }
+  }
+}
+
 // There is no config for setting the current nav item border color
 .usa-header--basic .usa-nav__primary-item > .usa-current::after {
   background-color: color("mint-40");
