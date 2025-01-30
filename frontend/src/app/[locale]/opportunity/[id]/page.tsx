@@ -21,6 +21,7 @@ import OpportunityHistory from "src/components/opportunity/OpportunityHistory";
 import OpportunityIntro from "src/components/opportunity/OpportunityIntro";
 import OpportunityLink from "src/components/opportunity/OpportunityLink";
 import OpportunityStatusWidget from "src/components/opportunity/OpportunityStatusWidget";
+import { OpportunitySaveUserControl } from "src/components/user/OpportunitySaveUserControl";
 
 type OpportunityListingProps = {
   params: Promise<{ id: string }>;
@@ -138,6 +139,7 @@ async function OpportunityListing({ params }: OpportunityListingProps) {
       <GridContainer>
         <div className="grid-row grid-gap">
           <div className="desktop:grid-col-8 tablet:grid-col-12 tablet:order-1 desktop:order-first">
+            <OpportunitySaveUserControl />
             <OpportunityDescription
               summary={opportunityData.summary}
               nofoPath={nofoPath}

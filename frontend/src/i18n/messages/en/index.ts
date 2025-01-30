@@ -78,6 +78,14 @@ export const messages = {
     },
     generic_error_cta: "Please try refreshing the page.",
   },
+  OpportunityListingLoginModal: {
+    title: "Sign in to save this opportunity",
+    help: "Use your Login.gov account to sign in to Simpler.Grants.gov. Don’t have an account? You can create one.",
+    description:
+      "You’ll be redirected to Login.gov to sign in or create an account. Then, you’ll return to Simpler.Grants.gov as a signed-in user.",
+    button: "Sign in with Login.gov",
+    close: "Cancel",
+  },
   Index: {
     page_title: "Simpler.Grants.gov",
     meta_description:
@@ -487,7 +495,7 @@ export const messages = {
     nav_link_logout: "Sign out",
     title: "Simpler.Grants.gov",
   },
-  LoginButtonModal: {
+  HeaderLoginModal: {
     title: "Sign in to Simpler.Grants.gov",
     help: "Simpler.Grants.gov uses Login.gov to verify your identity and manage your account securely. You don't need a separate username or password for this site.",
     description:

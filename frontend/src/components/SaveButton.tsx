@@ -5,7 +5,6 @@ import { USWDSIcon } from "./USWDSIcon";
 
 interface SaveButtonProps {
   onClick?: () => void;
-  children?: React.ReactNode;
   saved: boolean;
   loading: boolean;
   defaultText: string;
