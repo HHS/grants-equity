@@ -11,15 +11,19 @@ export type PaginationOrderBy =
   | "opportunity_id"
   | "opportunity_number"
   | "opportunity_title"
-  | "agency_code"
+  | "agency_name"
+  | "top_level_agency_code"
   | "post_date"
   | "close_date";
 export type PaginationSortDirection = "ascending" | "descending";
-export interface PaginationRequestBody {
+export type PaginationSortOrder = {
   order_by: PaginationOrderBy;
+  sort_direction: PaginationSortDirection;
+}[];
+export interface PaginationRequestBody {
   page_offset: number;
   page_size: number;
-  sort_direction: PaginationSortDirection;
+  sort_order: PaginationSortOrder;
 }
 
 export type SearchRequestBody = {
