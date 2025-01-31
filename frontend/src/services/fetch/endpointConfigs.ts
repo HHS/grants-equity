@@ -28,3 +28,24 @@ export const userLogoutEndpoint = {
   namespace: "users/token/logout",
   method: "POST" as ApiMethod,
 };
+
+export const userDeleteSavedOpportunityEndpoint = {
+  basePath: environment.API_URL,
+  version: "v1",
+  namespace: "users",
+  method: "DELETE" as ApiMethod,
+};
+
+export const userGetSavedOpportunityEndpoint = {
+  basePath: environment.API_URL,
+  version: "v1",
+  namespace: "users",
+  method: "GET" as ApiMethod,
+};
+
+export const userPostSavedOpportunityEndpoint = {
+  basePath: environment.API_URL,
+  version: "v1",
+  namespace: "users",
+  method: "POST" as ApiMethod,
+};
