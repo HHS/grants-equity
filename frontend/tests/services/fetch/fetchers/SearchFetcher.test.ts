@@ -42,10 +42,14 @@ describe("searchForOpportunities", () => {
     expect(mockfetchOpportunitySearch).toHaveBeenCalledWith({
       body: {
         pagination: {
-          order_by: "opportunity_number", // This should be the actual value being used in the API method
+          sort_order: [
+            {
+              order_by: "opportunity_number",
+              sort_direction: "ascending",
+            },
+          ], // This should be the actual value being used in the API method
           page_offset: 1,
           page_size: 25,
-          sort_direction: "ascending", // or "descending" based on your sortby parameter
         },
         query: "research",
         filters: {
@@ -126,9 +130,9 @@ describe("buildPagination", () => {
       ...{ page: 5, sortby: null },
     });
 
-    expect(pagination.order_by).toEqual("relevancy");
+    expect(pagination.sort_order[0].order_by).toEqual("relevancy");
     expect(pagination.page_offset).toEqual(5);
-    expect(pagination.sort_direction).toEqual("descending");
+    expect(pagination.sort_order[0].sort_direction).toEqual("descending");
   });
 
   it("builds correct offset based on action type and field changed", () => {
@@ -175,14 +179,14 @@ describe("buildPagination", () => {
       ...{ sortby: "closeDateAsc" },
     });
 
-    expect(pagination.order_by).toEqual("close_date");
+    expect(pagination.sort_order[0].order_by).toEqual("close_date");
 
     const secondPagination = buildPagination({
       ...searchProps,
       ...{ sortby: "postedDateAsc" },
     });
 
-    expect(secondPagination.order_by).toEqual("post_date");
+    expect(secondPagination.sort_order[0].order_by).toEqual("post_date");
   });
 
   it("builds correct sort_direction based on sortby", () => {
@@ -191,20 +195,20 @@ describe("buildPagination", () => {
       ...{ sortby: "opportunityNumberDesc" },
     });
 
-    expect(pagination.sort_direction).toEqual("descending");
+    expect(pagination.sort_order[0].sort_direction).toEqual("descending");
 
     const secondPagination = buildPagination({
       ...searchProps,
       ...{ sortby: "postedDateAsc" },
     });
 
-    expect(secondPagination.sort_direction).toEqual("ascending");
+    expect(secondPagination.sort_order[0].sort_direction).toEqual("ascending");
 
     const thirdPagination = buildPagination({
       ...searchProps,
       ...{ sortby: null },
     });
 
-    expect(thirdPagination.sort_direction).toEqual("descending");
+    expect(thirdPagination.sort_order[0].sort_direction).toEqual("descending");
   });
 });
