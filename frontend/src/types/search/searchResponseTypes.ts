@@ -43,6 +43,7 @@ export interface Summary {
 
 export interface Opportunity {
   agency: string | null;
+  agency_name: string | null;
   category: string | null;
   category_explanation: string | null;
   created_at: string;
@@ -52,6 +53,7 @@ export interface Opportunity {
   opportunity_status: OpportunityStatus;
   opportunity_title: string;
   summary: Summary;
+  top_level_agency_name: string | null;
   updated_at: string;
 }
 
