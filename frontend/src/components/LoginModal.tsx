@@ -1,3 +1,5 @@
+"use-client";
+
 import { RefObject } from "react";
 import {
   ButtonGroup,
@@ -34,6 +36,7 @@ export const LoginModal = ({
       aria-labelledby="login-modal-heading"
       aria-describedby="login-modal-description"
       id="login-modal"
+      renderToPortal={false}
     >
       <ModalHeading id="login-modal-heading">{titleText}</ModalHeading>
       <div className="usa-prose">

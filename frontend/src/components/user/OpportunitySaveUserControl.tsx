@@ -3,7 +3,8 @@
 import { useUser } from "src/services/auth/useUser";
 
 import { useTranslations } from "next-intl";
-import { useRef } from "react";
+import { useParams } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { ModalRef, ModalToggleButton } from "@trussworks/react-uswds";
 
 import { LoginModal } from "src/components/LoginModal";
@@ -13,10 +14,38 @@ import { USWDSIcon } from "src/components/USWDSIcon";
 export const OpportunitySaveUserControl = () => {
   const t = useTranslations("OpportunityListing");
   const modalRef = useRef<ModalRef>(null);
+  const params = useParams();
+  const opportunity_id = String(params.id);
 
   const { user } = useUser();
-  const loading = false;
-  const saved =  false;
+  const [saved, setSaved] = useState(false);
+  const [loading, setloading] = useState(false);
+
+  const userSavedOppCallback = async () => {
+    setloading(true);
+    await fetch("/api/user/saved-opportunities", {
+      method: "POST",
+      headers: {
+        saved: "true",
+        opportunity_id,
+      },
+    });
+    // const data = await res.json();
+    setloading(false);
+    setSaved(true);
+  };
+
+  useEffect(() => {
+    fetch(`/api/user/saved-opportunities/${opportunity_id}`)
+      .then((response) => response.json())
+      .then((data) => {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        data.length ?? setSaved(true);
+      })
+      .catch(() => {
+        setSaved(false);
+      });
+  }, [opportunity_id]);
 
   return (
     <>
@@ -46,6 +75,8 @@ export const OpportunitySaveUserControl = () => {
           savedText={t("save_button.saved")}
           loadingText={t("save_button.loading")}
           saved={saved}
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          onClick={userSavedOppCallback}
           loading={loading}
         />
       )}
