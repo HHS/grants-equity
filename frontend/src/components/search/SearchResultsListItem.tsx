@@ -97,7 +97,7 @@ export default function SearchResultsListItem({
                   : "--"}
               </span>
             </div>
-            <div className="grid-col tablet:order-3 overflow-hidden font-body-xs">
+            <div className="grid-col tablet:order-2 overflow-hidden font-body-xs">
               <span className={metadataBorderClasses}>
                 <strong>{t("resultsListItem.summary.agency")}</strong>
                 {opportunity?.top_level_agency_name &&
@@ -110,6 +110,8 @@ export default function SearchResultsListItem({
                         agencyNameLookup[opportunity?.summary?.agency_code]
                       : "--")}
               </span>
+            </div>
+            <div className="grid-col tablet:order-3 overflow-hidden font-body-xs">
               <span className={metadataBorderClasses}>
                 <strong>{t("resultsListItem.opportunity_number")}</strong>
                 {opportunity?.opportunity_number}
