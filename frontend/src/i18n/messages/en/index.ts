@@ -9,6 +9,19 @@ export const messages = {
     page_title: "Opportunity Listing",
     meta_description:
       "Read detailed information about this funding opportunity.",
+    save_button: {
+      save: "Save",
+      saved: "Saved",
+      loading: "Updating",
+    },
+    save_login_modal: {
+      title: "Sign in to save this opportunity",
+      help: "Use your Login.gov account to sign in to Simpler.Grants.gov. Don’t have an account? You can create one.",
+      description:
+        "You’ll be redirected to Login.gov to sign in or create an account. Then, you’ll return to Simpler.Grants.gov as a signed-in user.",
+      button: "Sign in with Login.gov",
+      close: "Cancel",
+    },
     intro: {
       agency: "Agency: ",
       assistance_listings: "Assistance Listings: ",
@@ -77,14 +90,6 @@ export const messages = {
       button_content: "View on Grants.gov",
     },
     generic_error_cta: "Please try refreshing the page.",
-  },
-  OpportunityListingLoginModal: {
-    title: "Sign in to save this opportunity",
-    help: "Use your Login.gov account to sign in to Simpler.Grants.gov. Don’t have an account? You can create one.",
-    description:
-      "You’ll be redirected to Login.gov to sign in or create an account. Then, you’ll return to Simpler.Grants.gov as a signed-in user.",
-    button: "Sign in with Login.gov",
-    close: "Cancel",
   },
   Index: {
     page_title: "Simpler.Grants.gov",
