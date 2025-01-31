@@ -1521,6 +1521,8 @@ components:
           - post_date
           - close_date
           - agency_code
+          - agency_name
+          - top_level_agency_name
           description: The field to sort the response by
         sort_direction:
           description: Whether to sort the response ascending or descending
