@@ -109,8 +109,9 @@ def test_get_opportunity_with_agency_200(client, api_auth_token, enable_factory_
 
 
 def test_get_opportunity_s3_endpoint_url_200(
-    client, api_auth_token, enable_factory_create, db_session, mock_s3_bucket
+    client, api_auth_token, enable_factory_create, db_session, mock_s3_bucket, monkeypatch_session
 ):
+    monkeypatch_session.delenv("CDN_URL")
     # Create an opportunity with a specific attachment
     opportunity = OpportunityFactory.create(opportunity_attachments=[])
     object_name = "test_file_1.txt"
@@ -153,3 +154,34 @@ def test_get_opportunity_404_not_found_is_draft(client, api_auth_token, enable_f
         resp.get_json()["message"]
         == f"Could not find Opportunity with ID {opportunity.opportunity_id}"
     )
+
+
+def test_get_opportunity_returns_cdn_urls(
+    client, api_auth_token, monkeypatch_session, enable_factory_create, db_session, mock_s3_bucket
+):
+    monkeypatch_session.setenv("CDN_URL", "https://cdn.example.com")
+    """Test that S3 file locations are converted to CDN URLs in the response"""
+    # Create an opportunity with a specific attachment
+    opportunity = OpportunityFactory.create(opportunity_attachments=[])
+
+    object_name = "test_file_1.txt"
+    file_loc = f"s3://{mock_s3_bucket}/{object_name}"
+    OpportunityAttachmentFactory.create(
+        file_location=file_loc, opportunity=opportunity, file_contents="Hello, world"
+    )
+
+    # Make the GET request
+    resp = client.get(
+        f"/v1/opportunities/{opportunity.opportunity_id}", headers={"X-Auth": api_auth_token}
+    )
+
+    # Check the response
+    assert resp.status_code == 200
+    response_data = resp.get_json()["data"]
+
+    # Verify attachment URL is a CDN URL
+    assert len(response_data["attachments"]) == 1
+    attachment = response_data["attachments"][0]
+
+    assert attachment["download_path"].startswith("https://cdn.")
+    assert "s3://" not in attachment["download_path"]

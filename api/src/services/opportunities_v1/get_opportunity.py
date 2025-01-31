@@ -5,10 +5,17 @@ from sqlalchemy.orm import noload, selectinload
 
 import src.adapters.db as db
 import src.util.datetime_util as datetime_util
+from src.adapters.aws import S3Config
 from src.api.route_utils import raise_flask_error
 from src.db.models.agency_models import Agency
 from src.db.models.opportunity_models import Opportunity, OpportunityAttachment, OpportunitySummary
-from src.util.file_util import pre_sign_file_location
+from src.util.env_config import PydanticBaseEnvConfig
+from src.util.file_util import convert_public_s3_to_cdn_url, pre_sign_file_location
+
+
+class AttachmentConfig(PydanticBaseEnvConfig):
+    # If the CDN URL is set, we'll use it instead of pre-signing the file locations
+    cdn_url: str | None = None
 
 
 def _fetch_opportunity(
@@ -50,7 +57,15 @@ def get_opportunity(db_session: db.Session, opportunity_id: int) -> Opportunity:
         db_session, opportunity_id, load_all_opportunity_summaries=False
     )
 
-    pre_sign_opportunity_file_location(opportunity.opportunity_attachments)
+    attachment_config = AttachmentConfig()
+    if attachment_config.cdn_url is not None:
+        s3_config = S3Config()
+        for opp_att in opportunity.opportunity_attachments:
+            opp_att.download_path = convert_public_s3_to_cdn_url(  # type: ignore
+                opp_att.file_location, attachment_config.cdn_url, s3_config
+            )
+    else:
+        pre_sign_opportunity_file_location(opportunity.opportunity_attachments)
 
     return opportunity
 

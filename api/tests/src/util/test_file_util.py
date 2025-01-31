@@ -211,3 +211,35 @@ def test_move_file_local_disk(tmp_path):
     assert file_util.file_exists(other_file_path) is True
 
     assert file_util.read_file(other_file_path) == contents
+
+
+@pytest.mark.parametrize(
+    "s3_path,cdn_url,expected",
+    [
+        (
+            "s3://local-mock-public-bucket/path/to/file.pdf",
+            "https://cdn.example.com",
+            "https://cdn.example.com/path/to/file.pdf",
+        ),
+        (
+            "s3://local-mock-public-bucket/opportunities/9/attachments/79853231/manager.webm",
+            "https://cdn.example.com",
+            "https://cdn.example.com/opportunities/9/attachments/79853231/manager.webm",
+        ),
+        # Test with subdirectory in CDN URL
+        (
+            "s3://local-mock-public-bucket/file.txt",
+            "https://cdn.example.com/assets",
+            "https://cdn.example.com/assets/file.txt",
+        ),
+    ],
+)
+def test_convert_s3_to_cdn_url(s3_path, cdn_url, expected, s3_config):
+    assert file_util.convert_public_s3_to_cdn_url(s3_path, cdn_url, s3_config) == expected
+
+
+def test_convert_s3_to_cdn_url_invalid_path(s3_config):
+    with pytest.raises(ValueError, match="Expected s3:// path"):
+        file_util.convert_public_s3_to_cdn_url(
+            "http://not-s3/file.txt", "cdn.example.com", s3_config
+        )

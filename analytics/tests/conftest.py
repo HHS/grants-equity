@@ -287,6 +287,12 @@ def reset_aws_env_vars(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("AWS_DEFAULT_REGION", "us-east-1")
 
 
+@pytest.fixture(autouse=True)
+def use_cdn(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Set up CDN URL environment variable for tests."""
+    monkeypatch.setenv("CDN_URL", "http://localhost:4566")
+
+
 @pytest.fixture
 def mock_s3() -> boto3.resource:
     """Instantiate an S3 bucket resource."""
