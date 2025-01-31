@@ -63,3 +63,10 @@ module "dms_networking" {
   our_cidr_block               = module.network.vpc_cidr
   grants_gov_oracle_cidr_block = module.project_config.network_configs[var.environment_name].grants_gov_oracle_cidr_block
 }
+
+module "vpn" {
+  source           = "../modules/vpn"
+  environment_name = var.environment_name
+  second_octet     = module.project_config.network_configs["vpn"].second_octet
+  vpc_id           = module.network.vpc_id
+}
