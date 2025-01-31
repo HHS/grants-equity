@@ -4,6 +4,7 @@ import { fetchOpportunitySearch } from "src/services/fetch/fetchers/fetchers";
 import {
   PaginationOrderBy,
   PaginationRequestBody,
+  PaginationSortOrder,
   QueryParamData,
   SearchFetcherActionType,
   SearchFilterRequestBody,
@@ -11,12 +12,12 @@ import {
 } from "src/types/search/searchRequestTypes";
 
 const orderByFieldLookup = {
-  relevancy: "relevancy",
-  opportunityNumber: "opportunity_number",
-  opportunityTitle: "opportunity_title",
-  agency: "agency_code",
-  postedDate: "post_date",
-  closeDate: "close_date",
+  relevancy: ["relevancy"],
+  opportunityNumber: ["opportunity_number"],
+  opportunityTitle: ["opportunity_title"],
+  agency: ["top_level_agency_name", "agency_name"],
+  postedDate: ["post_date"],
+  closeDate: ["close_date"],
 };
 
 type FrontendFilterNames =
@@ -98,24 +99,38 @@ export const buildPagination = (
       ? 1
       : page;
 
-  let order_by: PaginationOrderBy = "relevancy";
+  let sort_order: PaginationSortOrder = [
+    { order_by: "relevancy", sort_direction: "descending" },
+    { order_by: "post_date", sort_direction: "descending" },
+  ];
+
   if (sortby) {
+    sort_order = [];
+    // this will need to change in a future where we allow the user to set an ordered set of sort columns.
+    // for now we're just using the multiple internally behind a single column picker drop down so this is fine.
     for (const [key, value] of Object.entries(orderByFieldLookup)) {
       if (sortby.startsWith(key)) {
-        order_by = value as PaginationOrderBy;
-        break; // Stop searching after the first match is found
+        const sort_direction =
+          sortby && sortby.endsWith("Asc") ? "ascending" : "descending";
+        value.forEach((item) => {
+          sort_order.push({
+            order_by: <PaginationOrderBy>item,
+            sort_direction,
+          });
+          if (item === "relevancy") {
+            sort_order.push({
+              order_by: "post_date",
+              sort_direction,
+            });
+          }
+        });
       }
     }
   }
 
-  // sort relevancy descending without suffix
-  const sort_direction =
-    sortby && sortby.endsWith("Asc") ? "ascending" : "descending";
-
   return {
-    order_by,
     page_offset,
     page_size: 25,
-    sort_direction,
+    sort_order,
   };
 };

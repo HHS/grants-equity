@@ -41,6 +41,8 @@ REQUEST_FIELD_NAME_MAPPING = {
     "close_date": "summary.close_date",
     "agency_code": "agency_code.keyword",
     "agency": "agency_code.keyword",
+    "agency_name": "agency_name.keyword",
+    "top_level_agency_name": "top_level_agency_name.keyword",
     "opportunity_status": "opportunity_status.keyword",
     "funding_instrument": "summary.funding_instruments.keyword",
     "funding_category": "summary.funding_categories.keyword",
