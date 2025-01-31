@@ -370,8 +370,9 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=25,
                     page_offset=1,
-                    order_by="opportunity_id",
-                    sort_direction=SortDirection.ASCENDING,
+                    sort_order=[
+                        {"order_by": "opportunity_id", "sort_direction": SortDirection.ASCENDING}
+                    ],
                 ),
                 OPPORTUNITIES,
             ),
@@ -379,8 +380,9 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=3,
                     page_offset=2,
-                    order_by="opportunity_id",
-                    sort_direction=SortDirection.ASCENDING,
+                    sort_order=[
+                        {"order_by": "opportunity_id", "sort_direction": SortDirection.ASCENDING}
+                    ],
                 ),
                 OPPORTUNITIES[3:6],
             ),
@@ -388,8 +390,9 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=25,
                     page_offset=1,
-                    order_by="opportunity_id",
-                    sort_direction=SortDirection.DESCENDING,
+                    sort_order=[
+                        {"order_by": "opportunity_id", "sort_direction": SortDirection.DESCENDING}
+                    ],
                 ),
                 OPPORTUNITIES[::-1],
             ),
@@ -398,8 +401,12 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=3,
                     page_offset=1,
-                    order_by="opportunity_number",
-                    sort_direction=SortDirection.ASCENDING,
+                    sort_order=[
+                        {
+                            "order_by": "opportunity_number",
+                            "sort_direction": SortDirection.ASCENDING,
+                        }
+                    ],
                 ),
                 [LOC_TEACHING, LOC_HIGHER_EDUCATION, DOC_MANUFACTURING],
             ),
@@ -407,8 +414,12 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=2,
                     page_offset=3,
-                    order_by="opportunity_number",
-                    sort_direction=SortDirection.DESCENDING,
+                    sort_order=[
+                        {
+                            "order_by": "opportunity_number",
+                            "sort_direction": SortDirection.DESCENDING,
+                        }
+                    ],
                 ),
                 [NASA_K12_DIVERSITY, NASA_SPACE_FELLOWSHIP],
             ),
@@ -417,8 +428,9 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=4,
                     page_offset=2,
-                    order_by="opportunity_title",
-                    sort_direction=SortDirection.ASCENDING,
+                    sort_order=[
+                        {"order_by": "opportunity_title", "sort_direction": SortDirection.ASCENDING}
+                    ],
                 ),
                 [NASA_SPACE_FELLOWSHIP, LOC_HIGHER_EDUCATION, DOC_SPACE_COAST, NASA_K12_DIVERSITY],
             ),
@@ -426,8 +438,12 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=5,
                     page_offset=1,
-                    order_by="opportunity_title",
-                    sort_direction=SortDirection.DESCENDING,
+                    sort_order=[
+                        {
+                            "order_by": "opportunity_title",
+                            "sort_direction": SortDirection.DESCENDING,
+                        }
+                    ],
                 ),
                 [
                     LOC_TEACHING,
@@ -442,8 +458,9 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=2,
                     page_offset=1,
-                    order_by="post_date",
-                    sort_direction=SortDirection.ASCENDING,
+                    sort_order=[
+                        {"order_by": "post_date", "sort_direction": SortDirection.ASCENDING}
+                    ],
                 ),
                 [DOC_MANUFACTURING, DOC_SPACE_COAST],
             ),
@@ -451,8 +468,9 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=3,
                     page_offset=1,
-                    order_by="post_date",
-                    sort_direction=SortDirection.DESCENDING,
+                    sort_order=[
+                        {"order_by": "post_date", "sort_direction": SortDirection.DESCENDING}
+                    ],
                 ),
                 [LOC_TEACHING, DOS_DIGITAL_LITERACY, LOC_HIGHER_EDUCATION],
             ),
@@ -460,8 +478,9 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=3,
                     page_offset=12,
-                    order_by="post_date",
-                    sort_direction=SortDirection.DESCENDING,
+                    sort_order=[
+                        {"order_by": "post_date", "sort_direction": SortDirection.DESCENDING}
+                    ],
                 ),
                 [],
             ),
@@ -470,8 +489,10 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=2,
                     page_offset=1,
-                    order_by="relevancy",
-                    sort_direction=SortDirection.ASCENDING,
+                    sort_order=[
+                        {"order_by": "relevancy", "sort_direction": SortDirection.ASCENDING},
+                        {"order_by": "post_date", "sort_direction": SortDirection.ASCENDING},
+                    ],
                 ),
                 [DOC_MANUFACTURING, DOC_SPACE_COAST],
             ),
@@ -479,8 +500,10 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=3,
                     page_offset=1,
-                    order_by="relevancy",
-                    sort_direction=SortDirection.DESCENDING,
+                    sort_order=[
+                        {"order_by": "relevancy", "sort_direction": SortDirection.DESCENDING},
+                        {"order_by": "post_date", "sort_direction": SortDirection.DESCENDING},
+                    ],
                 ),
                 [LOC_TEACHING, DOS_DIGITAL_LITERACY, LOC_HIGHER_EDUCATION],
             ),
@@ -488,8 +511,10 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=3,
                     page_offset=12,
-                    order_by="relevancy",
-                    sort_direction=SortDirection.DESCENDING,
+                    sort_order=[
+                        {"order_by": "relevancy", "sort_direction": SortDirection.DESCENDING},
+                        {"order_by": "post_date", "sort_direction": SortDirection.DESCENDING},
+                    ],
                 ),
                 [],
             ),
@@ -498,8 +523,9 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=4,
                     page_offset=1,
-                    order_by="close_date",
-                    sort_direction=SortDirection.ASCENDING,
+                    sort_order=[
+                        {"order_by": "close_date", "sort_direction": SortDirection.ASCENDING}
+                    ],
                 ),
                 [LOC_TEACHING, NASA_K12_DIVERSITY, DOC_SPACE_COAST, DOS_DIGITAL_LITERACY],
             ),
@@ -507,8 +533,9 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=3,
                     page_offset=1,
-                    order_by="close_date",
-                    sort_direction=SortDirection.DESCENDING,
+                    sort_order=[
+                        {"order_by": "close_date", "sort_direction": SortDirection.DESCENDING}
+                    ],
                 ),
                 [DOC_MANUFACTURING, NASA_SUPERSONIC, NASA_SPACE_FELLOWSHIP],
             ),
@@ -517,8 +544,9 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=5,
                     page_offset=2,
-                    order_by="close_date",
-                    sort_direction=SortDirection.ASCENDING,
+                    sort_order=[
+                        {"order_by": "close_date", "sort_direction": SortDirection.ASCENDING}
+                    ],
                 ),
                 [NASA_SUPERSONIC, DOC_MANUFACTURING, NASA_INNOVATIONS, LOC_HIGHER_EDUCATION],
             ),
@@ -527,8 +555,9 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=5,
                     page_offset=1,
-                    order_by="agency_code",
-                    sort_direction=SortDirection.ASCENDING,
+                    sort_order=[
+                        {"order_by": "agency_code", "sort_direction": SortDirection.ASCENDING}
+                    ],
                 ),
                 [
                     DOC_SPACE_COAST,
@@ -542,8 +571,9 @@ class TestOpportunityRouteSearch(BaseTestClass):
                 get_search_request(
                     page_size=3,
                     page_offset=1,
-                    order_by="agency_code",
-                    sort_direction=SortDirection.DESCENDING,
+                    sort_order=[
+                        {"order_by": "agency_code", "sort_direction": SortDirection.DESCENDING}
+                    ],
                 ),
                 [NASA_SPACE_FELLOWSHIP, NASA_INNOVATIONS, NASA_SUPERSONIC],
             ),
@@ -1402,7 +1432,10 @@ class TestOpportunityRouteSearch(BaseTestClass):
             # and don't want to break this every time we adjust those.
             (
                 get_search_request(
-                    order_by="opportunity_id", sort_direction=SortDirection.ASCENDING, query="space"
+                    sort_order=[
+                        {"order_by": "opportunity_id", "sort_direction": SortDirection.ASCENDING}
+                    ],
+                    query="space",
                 ),
                 [
                     NASA_SPACE_FELLOWSHIP,
@@ -1414,38 +1447,45 @@ class TestOpportunityRouteSearch(BaseTestClass):
             ),
             (
                 get_search_request(
-                    order_by="opportunity_id",
-                    sort_direction=SortDirection.ASCENDING,
+                    sort_order=[
+                        {"order_by": "opportunity_id", "sort_direction": SortDirection.ASCENDING}
+                    ],
                     query="43.008",
                 ),
                 [NASA_SPACE_FELLOWSHIP, NASA_K12_DIVERSITY, LOC_TEACHING],
             ),
             (
                 get_search_request(
-                    order_by="opportunity_id",
-                    sort_direction=SortDirection.ASCENDING,
+                    sort_order=[
+                        {"order_by": "opportunity_id", "sort_direction": SortDirection.ASCENDING}
+                    ],
                     query="012ADV*",
                 ),
                 [LOC_TEACHING, LOC_HIGHER_EDUCATION],
             ),
             (
                 get_search_request(
-                    order_by="opportunity_id", sort_direction=SortDirection.ASCENDING, query="DOC*"
+                    sort_order=[
+                        {"order_by": "opportunity_id", "sort_direction": SortDirection.ASCENDING}
+                    ],
+                    query="DOC*",
                 ),
                 [DOC_SPACE_COAST, DOC_MANUFACTURING],
             ),
             (
                 get_search_request(
-                    order_by="opportunity_id",
-                    sort_direction=SortDirection.ASCENDING,
+                    sort_order=[
+                        {"order_by": "opportunity_id", "sort_direction": SortDirection.ASCENDING}
+                    ],
                     query="Aeronautics",
                 ),
                 [NASA_SUPERSONIC],
             ),
             (
                 get_search_request(
-                    order_by="opportunity_id",
-                    sort_direction=SortDirection.ASCENDING,
+                    sort_order=[
+                        {"order_by": "opportunity_id", "sort_direction": SortDirection.ASCENDING}
+                    ],
                     query="literacy",
                 ),
                 [LOC_TEACHING, DOS_DIGITAL_LITERACY],

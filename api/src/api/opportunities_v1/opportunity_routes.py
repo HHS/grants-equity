@@ -36,10 +36,14 @@ examples = {
         "summary": "No filters",
         "value": {
             "pagination": {
-                "order_by": "opportunity_id",
+                "sort_order": [
+                    {
+                        "order_by": "opportunity_id",
+                        "sort_direction": "ascending",
+                    }
+                ],
                 "page_offset": 1,
                 "page_size": 25,
-                "sort_direction": "ascending",
             },
         },
     },
@@ -61,10 +65,14 @@ examples = {
                 },
             },
             "pagination": {
-                "order_by": "opportunity_id",
+                "sort_order": [
+                    {
+                        "order_by": "opportunity_id",
+                        "sort_direction": "ascending",
+                    }
+                ],
                 "page_offset": 1,
                 "page_size": 25,
-                "sort_direction": "descending",
             },
         },
     },
@@ -76,10 +84,14 @@ examples = {
                 "opportunity_status": {"one_of": ["forecasted", "posted"]},
             },
             "pagination": {
-                "order_by": "opportunity_id",
+                "sort_order": [
+                    {
+                        "order_by": "opportunity_id",
+                        "sort_direction": "ascending",
+                    }
+                ],
                 "page_offset": 1,
                 "page_size": 25,
-                "sort_direction": "descending",
             },
         },
     },
@@ -91,10 +103,14 @@ examples = {
                 "opportunity_status": {"one_of": ["forecasted", "posted"]},
             },
             "pagination": {
-                "order_by": "opportunity_id",
+                "sort_order": [
+                    {
+                        "order_by": "opportunity_id",
+                        "sort_direction": "ascending",
+                    }
+                ],
                 "page_offset": 1,
                 "page_size": 100,
-                "sort_direction": "ascending",
             },
         },
     },
@@ -108,25 +124,46 @@ examples = {
                 "estimated_total_program_funding": {"min": 100000, "max": 250000},
             },
             "pagination": {
-                "order_by": "opportunity_id",
+                "sort_order": [
+                    {
+                        "order_by": "opportunity_id",
+                        "sort_direction": "ascending",
+                    }
+                ],
                 "page_offset": 1,
                 "page_size": 25,
-                "sort_direction": "descending",
             },
         },
     },
     "example6": {
-        "summary": "FIlter by assistance listing numbers",
+        "summary": "Filter by assistance listing numbers",
         "value": {
             "filters": {
                 "assistance_listing_number": {"one_of": ["43.001", "47.049"]},
             },
             "pagination": {
-                "order_by": "opportunity_id",
+                "sort_order": [
+                    {
+                        "order_by": "opportunity_id",
+                        "sort_direction": "ascending",
+                    }
+                ],
                 "page_offset": 1,
                 "page_size": 25,
-                "sort_direction": "descending",
             },
+        },
+    },
+    "example7": {
+        "summary": "Primary sort agency_code desc, secondary sort opportunity_id asc",
+        "value": {
+            "pagination": {
+                "page_offset": 1,
+                "page_size": 25,
+                "sort_order": [
+                    {"order_by": "agency_code", "sort_direction": "descending"},
+                    {"order_by": "opportunity_id", "sort_direction": "ascending"},
+                ],
+            }
         },
     },
 }

@@ -97,9 +97,13 @@ def test_user_save_search_post(client, user, user_auth_token, enable_factory_cre
         "format": "json",
         "filters": {"agency": {"one_of": ["LOC"]}, "funding_instrument": {"one_of": ["grant"]}},
         "pagination": {
-            "order_by": "opportunity_id",
             "page_size": 25,
             "page_offset": 1,
-            "sort_direction": "ascending",
+            "sort_order": [
+                {
+                    "order_by": "opportunity_id",
+                    "sort_direction": "ascending",
+                }
+            ],
         },
     }

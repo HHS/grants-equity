@@ -485,6 +485,7 @@ class OpportunitySearchRequestV1Schema(Schema):
                 "close_date",
                 "agency_code",
             ],
+            default_sort_order=[{"order_by": "opportunity_id", "sort_direction": "descending"}],
         ),
         required=True,
     )

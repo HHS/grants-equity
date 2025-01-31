@@ -85,7 +85,7 @@ class UserSavedOpportunity(ApiSchemaTable, TimestampMixin):
     )
 
     last_notified_at: Mapped[datetime] = mapped_column(
-        default=datetime.utcnow, server_default="NOW()", nullable=False
+        default=datetime_util.utcnow, server_default="NOW()", nullable=False
     )
 
     user: Mapped[User] = relationship(User, back_populates="saved_opportunities")

@@ -30,8 +30,7 @@ def truncate_opportunities(db_session):
 def get_search_request(
     page_offset: int = 1,
     page_size: int = 25,
-    order_by: str = "opportunity_id",
-    sort_direction: str = "ascending",
+    sort_order: list[dict] | None = None,
     query: str | None = None,
     experimental: dict | None = None,
     funding_instrument_one_of: list[FundingInstrument] | None = None,
@@ -49,12 +48,14 @@ def get_search_request(
     close_date: dict | None = None,
     format: str | None = None,
 ):
+    if sort_order is None:
+        sort_order = [{"order_by": "opportunity_id", "sort_direction": "ascending"}]
+
     req = {
         "pagination": {
             "page_offset": page_offset,
             "page_size": page_size,
-            "order_by": order_by,
-            "sort_direction": sort_direction,
+            "sort_order": sort_order,
         }
     }
 

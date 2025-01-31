@@ -16,10 +16,14 @@ examples = {
         "summary": "No filters",
         "value": {
             "pagination": {
-                "order_by": "created_at",
+                "sort_order": [
+                    {
+                        "order_by": "created_at",
+                        "sort_direction": "descending",
+                    }
+                ],
                 "page_offset": 1,
                 "page_size": 25,
-                "sort_direction": "descending",
             },
         },
     },
