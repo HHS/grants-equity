@@ -18,7 +18,6 @@ data "aws_subnets" "database" {
   }
 }
 
-
 locals {
   # The prefix key/value pair is used for Terraform Workspaces, which is useful for projects with multiple infrastructure developers.
   # By default, Terraform creates a workspace named “default.” If a non-default workspace is not created this prefix will equal “default”,
@@ -33,6 +32,7 @@ locals {
 
   environment_config = module.app_config.environment_configs[var.environment_name]
   database_config    = local.environment_config.database_config
+  network_config     = module.project_config.network_configs[local.environment_config.network_name]
 }
 
 terraform {
@@ -81,25 +81,21 @@ module "database" {
   source = "../../modules/database"
 
   name                        = "${local.prefix}${local.database_config.cluster_name}"
-  access_policy_name          = "${local.prefix}${local.database_config.access_policy_name}"
   app_access_policy_name      = "${local.prefix}${local.database_config.app_access_policy_name}"
   migrator_access_policy_name = "${local.prefix}${local.database_config.migrator_access_policy_name}"
-
   # The following are not AWS infra resources and therefore do not need to be
   # isolated via the terraform workspace prefix
-  app_username      = local.database_config.app_username
-  migrator_username = local.database_config.migrator_username
-  schema_name       = local.database_config.schema_name
-  instance_count    = local.database_config.instance_count
-  max_capacity      = local.database_config.max_capacity
-  min_capacity      = local.database_config.min_capacity
-
-  enable_http_endpoint = local.database_config.enable_http_endpoint
-
+  app_username                   = local.database_config.app_username
+  migrator_username              = local.database_config.migrator_username
+  schema_name                    = local.database_config.schema_name
+  instance_count                 = local.database_config.instance_count
+  max_capacity                   = local.database_config.max_capacity
+  min_capacity                   = local.database_config.min_capacity
+  enable_http_endpoint           = local.database_config.enable_http_endpoint
   vpc_id                         = data.aws_vpc.network.id
   private_subnet_ids             = data.aws_subnets.database.ids
   aws_services_security_group_id = data.aws_security_groups.aws_services.ids[0]
-  db_subnet_group_name           = var.environment_name
+  database_subnet_group_name     = var.environment_name
   environment_name               = var.environment_name
   grants_gov_oracle_cidr_block   = module.project_config.network_configs[var.environment_name].grants_gov_oracle_cidr_block
 }

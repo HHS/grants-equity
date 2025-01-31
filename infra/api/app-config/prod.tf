@@ -3,6 +3,7 @@ module "prod_config" {
   app_name                        = local.app_name
   default_region                  = module.project_config.default_region
   environment                     = "prod"
+  network_name                    = "prod"
   has_database                    = local.has_database
   domain                          = "api.simpler.grants.gov"
   database_enable_http_endpoint   = true

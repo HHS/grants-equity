@@ -52,11 +52,12 @@ echo "Creating bucket: $TF_STATE_BUCKET_NAME"
 # For creating buckets outside of us-east-1, a LocationConstraint needs to be set
 # For creating buckets in us-east-1, LocationConstraint cannot be set
 # See https://docs.aws.amazon.com/cli/latest/reference/s3api/create-bucket.html
-CREATE_BUCKET_CONFIGURATION=""
+CREATE_BUCKET_CONFIGURATION=("")
 if [ "$REGION" != "us-east-1" ]; then
-  CREATE_BUCKET_CONFIGURATION="--create-bucket-configuration LocationConstraint=$REGION"
+  CREATE_BUCKET_CONFIGURATION=("--create-bucket-configuration" "LocationConstraint=$REGION")
 fi
-aws s3api create-bucket --bucket "$TF_STATE_BUCKET_NAME" --region "$REGION" "$CREATE_BUCKET_CONFIGURATION" > /dev/null
+
+aws s3api create-bucket --bucket "$TF_STATE_BUCKET_NAME" --region "$REGION" "${CREATE_BUCKET_CONFIGURATION[@]}" > /dev/null
 echo
 echo "----------------------------------"
 echo "Creating rest of account resources"
@@ -64,6 +65,21 @@ echo "----------------------------------"
 echo
 
 cd infra/accounts
+
+# Create the OpenID Connect provider for GitHub Actions to allow GitHub Actions
+# to authenticate with AWS and manage AWS resources. We create the OIDC provider
+# via AWS CLI rather than via Terraform because we need to first check if there
+# is already an existing OpenID Connect provider for GitHub Actions. This check
+# is needed since there can only be one OpenID Connect provider per URL per AWS
+# account.
+github_arn=$(aws iam list-open-id-connect-providers | jq -r ".[] | .[] | .Arn" | grep github || echo "")
+
+if [[ -z ${github_arn} ]]; then
+  aws iam create-open-id-connect-provider \
+    --url "https://token.actions.githubusercontent.com" \
+    --client-id-list "sts.amazonaws.com" \
+    --thumbprint-list "0000000000000000000000000000000000000000"
+fi
 
 # Create the infrastructure for the terraform backend such as the S3 bucket
 # for storing tfstate files and the DynamoDB table for tfstate locks.

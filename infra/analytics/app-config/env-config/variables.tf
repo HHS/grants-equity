@@ -7,6 +7,11 @@ variable "environment" {
   type        = string
 }
 
+variable "network_name" {
+  description = "Human readable identifier of the network / VPC"
+  type        = string
+}
+
 variable "default_region" {
   description = "default region for the project"
   type        = string
@@ -36,4 +41,19 @@ variable "service_override_extra_environment_variables" {
     Map from environment variable name to environment variable value
     EOT
   default     = {}
+}
+
+variable "service_cpu" {
+  type    = number
+  default = 256
+}
+
+variable "service_memory" {
+  type    = number
+  default = 512
+}
+
+variable "service_desired_instance_count" {
+  type    = number
+  default = 1
 }

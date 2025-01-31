@@ -17,6 +17,9 @@ locals {
   # The ARN that represents the users accessing the database are of the format: "arn:aws:rds-db:<region>:<account-id>:dbuser:<resource-id>/<database-user-name>""
   # See https://aws.amazon.com/blogs/database/using-iam-authentication-to-connect-with-pgadmin-amazon-aurora-postgresql-or-amazon-rds-for-postgresql/
   db_user_arn_prefix = "arn:aws:rds-db:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:dbuser:${aws_rds_cluster.db.cluster_resource_id}"
+
+  engine_version       = "15.4"
+  engine_major_version = regex("^\\d+", local.engine_version)
 }
 
 # Database Configuration
@@ -32,12 +35,15 @@ resource "aws_rds_cluster" "db" {
 
   engine                      = "aurora-postgresql"
   engine_mode                 = "provisioned"
+  engine_version              = local.engine_version
   database_name               = var.database_name
   port                        = var.port
   master_username             = local.master_username
   manage_master_user_password = true
   storage_encrypted           = true
   kms_key_id                  = aws_kms_key.db.arn
+
+  db_cluster_parameter_group_name = aws_rds_cluster_parameter_group.rds_query_logging.name
 
   # checkov:skip=CKV_AWS_128:Auth decision needs to be ironed out
   # checkov:skip=CKV_AWS_162:Auth decision needs to be ironed out
@@ -55,9 +61,8 @@ resource "aws_rds_cluster" "db" {
     min_capacity = var.min_capacity
   }
 
-  vpc_security_group_ids = [aws_security_group.db.id]
-  db_subnet_group_name   = var.db_subnet_group_name
-
+  db_subnet_group_name            = var.database_subnet_group_name
+  vpc_security_group_ids          = [aws_security_group.db.id]
   enabled_cloudwatch_logs_exports = ["postgresql"]
 }
 
@@ -67,7 +72,7 @@ resource "aws_rds_cluster_instance" "instance" {
   identifier                            = "${var.name}-instance-${count.index}"
   cluster_identifier                    = aws_rds_cluster.db.id
   instance_class                        = "db.serverless"
-  db_subnet_group_name                  = var.db_subnet_group_name
+  db_subnet_group_name                  = var.database_subnet_group_name
   engine                                = aws_rds_cluster.db.engine
   engine_version                        = aws_rds_cluster.db.engine_version
   promotion_tier                        = 0
@@ -91,7 +96,7 @@ resource "aws_kms_key" "db" {
 
 resource "aws_rds_cluster_parameter_group" "rds_query_logging" {
   name        = var.name
-  family      = "aurora-postgresql14"
+  family      = "aurora-postgresql${local.engine_major_version}"
   description = "Default cluster parameter group"
 
   parameter {

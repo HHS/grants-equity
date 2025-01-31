@@ -69,20 +69,32 @@ resource "aws_security_group" "app" {
     # just ignore it
     ignore_changes = [description]
   }
+}
 
-  ingress {
-    description     = "Allow HTTP traffic to application container port"
-    protocol        = "tcp"
-    from_port       = var.container_port
-    to_port         = var.container_port
-    security_groups = [aws_security_group.alb.id]
-  }
+resource "aws_vpc_security_group_egress_rule" "service_egress_to_all" {
+  security_group_id = aws_security_group.app.id
+  description       = "Allow all outgoing traffic from application"
 
-  egress {
-    description = "Allow all outgoing traffic from application"
-    protocol    = "-1"
-    from_port   = 0
-    to_port     = 0
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+  ip_protocol = "-1"
+  cidr_ipv4   = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "service_ingress_from_load_balancer" {
+  security_group_id = aws_security_group.app.id
+  description       = "Allow HTTP traffic to application container port"
+
+  from_port                    = var.container_port
+  to_port                      = var.container_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.alb.id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "vpc_endpoints_ingress_from_service" {
+  security_group_id = var.aws_services_security_group_id
+  description       = "Allow inbound requests to VPC endpoints from role manager"
+
+  from_port                    = 443
+  to_port                      = 443
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = aws_security_group.app.id
 }

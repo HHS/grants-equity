@@ -7,6 +7,11 @@ variable "environment" {
   type        = string
 }
 
+variable "network_name" {
+  description = "Human readable identifier of the network / VPC"
+  type        = string
+}
+
 variable "default_region" {
   description = "default region for the project"
   type        = string

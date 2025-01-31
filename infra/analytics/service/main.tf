@@ -1,4 +1,3 @@
-# docs: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc
 data "aws_vpc" "network" {
   filter {
     name   = "tag:Name"
@@ -6,7 +5,6 @@ data "aws_vpc" "network" {
   }
 }
 
-# docs: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet
 data "aws_subnets" "private" {
   filter {
     name   = "vpc-id"
@@ -18,7 +16,6 @@ data "aws_subnets" "private" {
   }
 }
 
-# docs: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnet
 data "aws_subnets" "public" {
   filter {
     name   = "vpc-id"
@@ -102,31 +99,49 @@ data "aws_iam_policy" "migrator_db_access_policy" {
   name  = local.database_config.migrator_access_policy_name
 }
 
+data "aws_security_groups" "aws_services" {
+  filter {
+    name   = "group-name"
+    values = ["${module.project_config.aws_services_security_group_name_prefix}*"]
+  }
+
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.network.id]
+  }
+}
+
+data "aws_security_groups" "aws_services" {
+  filter {
+    name   = "group-name"
+    values = ["${module.project_config.aws_services_security_group_name_prefix}*"]
+  }
+
+  filter {
+    name   = "vpc-id"
+    values = [data.aws_vpc.network.id]
+  }
+}
+
 module "service" {
-  source                = "../../modules/service"
-  service_name          = local.service_name
-  is_temporary          = false
-  enable_load_balancer  = false
-  image_repository_name = module.app_config.image_repository_name
-  image_tag             = local.image_tag
-  vpc_id                = data.aws_vpc.network.id
-  public_subnet_ids     = data.aws_subnets.public.ids
-  private_subnet_ids    = data.aws_subnets.private.ids
-  cpu                   = 1024
-  memory                = 4096
-
-  readonly_root_filesystem = false
-
-  # This is a task based service, not a web server, so we don't need to run any instances of the service at rest.
-  desired_instance_count = 0
-
-  cert_arn = local.domain != null ? data.aws_acm_certificate.cert[0].arn : null
-
-  app_access_policy_arn      = data.aws_iam_policy.app_db_access_policy[0].arn
-  migrator_access_policy_arn = data.aws_iam_policy.migrator_db_access_policy[0].arn
-
-  scheduled_jobs = local.environment_config.scheduled_jobs
-
+  source                         = "../../modules/service"
+  service_name                   = local.service_name
+  is_temporary                   = false
+  enable_load_balancer           = false
+  image_repository_name          = module.app_config.image_repository_name
+  image_tag                      = local.image_tag
+  vpc_id                         = data.aws_vpc.network.id
+  public_subnet_ids              = data.aws_subnets.public.ids
+  private_subnet_ids             = data.aws_subnets.private.ids
+  aws_services_security_group_id = data.aws_security_groups.aws_services.ids[0]
+  cpu                            = 1024
+  memory                         = 4096
+  readonly_root_filesystem       = false
+  desired_instance_count         = 0 # This is a task based service, not a web server, so we don't need to run any instances of the service at rest.
+  cert_arn                       = local.domain != null ? data.aws_acm_certificate.cert[0].arn : null
+  app_access_policy_arn          = data.aws_iam_policy.app_db_access_policy[0].arn
+  migrator_access_policy_arn     = data.aws_iam_policy.migrator_db_access_policy[0].arn
+  scheduled_jobs                 = local.environment_config.scheduled_jobs
   db_vars = {
     security_group_ids = data.aws_rds_cluster.db_cluster[0].vpc_security_group_ids
     connection_info = {
@@ -137,23 +152,31 @@ module "service" {
       schema_name = local.database_config.schema_name
     }
   }
-
   extra_environment_variables = merge(
     local.service_config.extra_environment_variables,
     local.api_analytics_bucket_environment_variables,
     { "ENVIRONMENT" : var.environment_name },
   )
-
   secrets = concat(
     [for secret_name in keys(local.service_config.secrets) : {
       name      = secret_name
       valueFrom = module.secrets[secret_name].secret_arn
     }],
   )
-
   extra_policies = merge(
     {
       api_analytics_bucket_access = aws_iam_policy.api_analytics_bucket_access.arn
     },
   )
+}
+
+module "feature_flags" {
+  source        = "../../modules/feature-flags"
+  service_name  = local.service_name
+  feature_flags = module.app_config.feature_flags
+}
+
+module "storage" {
+  source = "../../modules/storage"
+  name   = local.bucket_name
 }

@@ -8,3 +8,8 @@ variable "environment_name" {
   type        = string
   description = "name of the application environment"
 }
+
+variable "network_name" {
+  type        = string
+  description = "Human readable identifier for the VPC"
+}

@@ -14,6 +14,10 @@ output "has_database" {
   value = local.has_database
 }
 
+output "has_external_non_aws_service" {
+  value = local.has_external_non_aws_service
+}
+
 output "has_incident_management_service" {
   value = local.has_incident_management_service
 }

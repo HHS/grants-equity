@@ -1,8 +1,23 @@
 locals {
-  app_name                        = "frontend"
-  environments                    = ["dev", "staging", "prod"]
-  project_name                    = module.project_config.project_name
-  has_database                    = false
+  app_name     = "frontend"
+  environments = ["dev", "staging", "prod"]
+  project_name = module.project_config.project_name
+
+  # Whether or not the application has a database
+  # If enabled:
+  # 1. The networks associated with this application's environments will have
+  #    VPC endpoints needed by the database layer
+  # 2. Each environment's config will have a database_config property that is used to
+  #    pass db_vars into the infra/modules/service module, which provides the necessary
+  #    configuration for the service to access the database
+  has_database = false
+
+  # Whether or not the application depends on external non-AWS services.
+  # If enabled, the networks associated with this application's environments
+  # will have NAT gateways, which allows the service in the private subnet to
+  # make calls to the internet.
+  has_external_non_aws_service = true
+
   has_incident_management_service = false
   enable_autoscaling              = true
   hostname                        = "0.0.0.0"

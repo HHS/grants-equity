@@ -2,7 +2,6 @@ output "database_config" {
   value = var.has_database ? {
     region                      = var.default_region
     cluster_name                = "${var.app_name}-${var.environment}"
-    access_policy_name          = "${var.app_name}-${var.environment}-db-access"
     app_username                = "app"
     migrator_username           = "migrator"
     schema_name                 = "app"
@@ -10,6 +9,10 @@ output "database_config" {
     migrator_access_policy_name = "${var.app_name}-${var.environment}-migrator-access"
     instance_count              = var.database_instance_count
   } : null
+}
+
+output "network_name" {
+  value = var.network_name
 }
 
 output "service_config" {

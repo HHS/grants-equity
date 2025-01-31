@@ -115,7 +115,11 @@ variable "secrets" {
     valueFrom = string
   }))
   description = "List of configurations for defining environment variables that pull from SSM parameter store"
-  default     = []
+}
+
+variable "aws_services_security_group_id" {
+  type        = string
+  description = "Security group ID for VPC endpoints that access AWS Services"
 }
 
 variable "db_vars" {

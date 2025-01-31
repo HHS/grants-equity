@@ -29,6 +29,7 @@ locals {
 
   base_environment_variables = concat([
     { name : "PORT", value : tostring(var.container_port) },
+    { name : "AWS_DEFAULT_REGION", value : data.aws_region.current.name },
     { name : "AWS_REGION", value : data.aws_region.current.name },
     { name : "GENERAL_S3_BUCKET_URL", value : aws_s3_bucket.general_purpose.bucket_regional_domain_name },
     { name : "ENVIRONMENT", value : var.environment_name },

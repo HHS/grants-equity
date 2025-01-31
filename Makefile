@@ -64,8 +64,9 @@ infra-set-up-account: ## Configure and create resources for current AWS profile 
 	@:$(call check_defined, ACCOUNT_NAME, human readable name for account e.g. "prod" or the AWS account alias)
 	./bin/set-up-current-account.sh $(ACCOUNT_NAME)
 
-infra-configure-network: ## Configure default network
-	./bin/create-tfbackend.sh infra/networks default
+infra-configure-network: ## Configure network $NETWORK_NAME
+	@:$(call check_defined, NETWORK_NAME, the name of the network in /infra/networks)
+	./bin/create-tfbackend.sh infra/networks $(NETWORK_NAME)
 
 infra-configure-app-build-repository: ## Configure infra/$APP_NAME/build-repository tfbackend and tfvars files
 	@:$(call check_defined, APP_NAME, the name of subdirectory of /infra that holds the application's infrastructure code)
@@ -90,8 +91,10 @@ infra-configure-app-service: ## Configure infra/$APP_NAME/service module's tfbac
 infra-update-current-account: ## Update infra resources for current AWS profile
 	./bin/terraform-init-and-apply.sh infra/accounts `./bin/current-account-config-name.sh`
 
-infra-update-network: ## Update default network
-	./bin/terraform-init-and-apply.sh infra/networks default
+infra-update-network: ## Update network
+	@:$(call check_defined, NETWORK_NAME, the name of the network in /infra/networks)
+	terraform -chdir="infra/networks" init -input=false -reconfigure -backend-config="$(NETWORK_NAME).s3.tfbackend"
+	terraform -chdir="infra/networks" apply -var="network_name=$(NETWORK_NAME)"
 
 infra-update-app-build-repository: ## Create or update $APP_NAME's build repository
 	@:$(call check_defined, APP_NAME, the name of subdirectory of /infra that holds the application's infrastructure code)
@@ -109,7 +112,6 @@ infra-update-app-database-roles: ## Create or update database roles and schemas 
 	./bin/create-or-update-database-roles.sh $(APP_NAME) $(ENVIRONMENT)
 
 infra-update-app-service: ## Create or update $APP_NAME's web service module
-	# APP_NAME has a default value defined above, but check anyways in case the default is ever removed
 	@:$(call check_defined, APP_NAME, the name of subdirectory of /infra that holds the application's infrastructure code)
 	@:$(call check_defined, ENVIRONMENT, the name of the application environment e.g. "prod" or "staging")
 	terraform -chdir="infra/$(APP_NAME)/service" init -input=false -reconfigure -backend-config="$(ENVIRONMENT).s3.tfbackend"
