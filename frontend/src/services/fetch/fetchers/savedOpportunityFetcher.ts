@@ -1,4 +1,5 @@
 import {
+  deleteUserSavedOpportunity,
   gettUserSavedOpportunity,
   postUserSavedOpportunity,
 } from "src/services/fetch/fetchers/fetchers";
@@ -7,24 +8,36 @@ export const postSavedOpportunity = async (
   token: string,
   user_id: string,
   opportunity_id: number,
-  save: boolean,
 ) => {
   const ssgToken = {
     "X-SGG-Token": token,
   };
-  const subPath = save
-    ? `${user_id}/saved-opportunities`
-    : `${user_id}/saved-opportunities/${opportunity_id}`;
+  const subPath =  `${user_id}/saved-opportunities`;
 
-  const body = save
-    ? {
+  const body = {
         opportunity_id: String(opportunity_id),
-      }
-    : {};
+      };
   return postUserSavedOpportunity({
     subPath,
     additionalHeaders: ssgToken,
     body,
+  });
+};
+
+
+export const deleteSavedOpportunity = async (
+  token: string,
+  user_id: string,
+  opportunity_id: number,
+) => {
+  const ssgToken = {
+    "X-SGG-Token": token,
+  };
+  const subPath =  `${user_id}/saved-opportunities/${opportunity_id}`;
+
+  return deleteUserSavedOpportunity({
+    subPath,
+    additionalHeaders: ssgToken,
   });
 };
 

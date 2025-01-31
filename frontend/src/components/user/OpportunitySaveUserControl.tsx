@@ -22,17 +22,20 @@ export const OpportunitySaveUserControl = () => {
   const [loading, setloading] = useState(false);
 
   const userSavedOppCallback = async () => {
+    const method = saved ? "DELETE" : "POST"
     setloading(true);
-    await fetch("/api/user/saved-opportunities", {
-      method: "POST",
+    const res = await fetch("/api/user/saved-opportunities", {
+      method,
       headers: {
         saved: "true",
         opportunity_id,
       },
     });
-    // const data = await res.json();
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const data = await res.json();
     setloading(false);
-    setSaved(true);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    data.type === 'save' ? setSaved(true) : setSaved(false);
   };
 
   useEffect(() => {
