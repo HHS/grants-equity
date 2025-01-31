@@ -12,18 +12,17 @@ export const postSavedOpportunity = async (
   const ssgToken = {
     "X-SGG-Token": token,
   };
-  const subPath =  `${user_id}/saved-opportunities`;
+  const subPath = `${user_id}/saved-opportunities`;
 
   const body = {
-        opportunity_id: String(opportunity_id),
-      };
+    opportunity_id: String(opportunity_id),
+  };
   return postUserSavedOpportunity({
     subPath,
     additionalHeaders: ssgToken,
     body,
   });
 };
-
 
 export const deleteSavedOpportunity = async (
   token: string,
@@ -33,7 +32,7 @@ export const deleteSavedOpportunity = async (
   const ssgToken = {
     "X-SGG-Token": token,
   };
-  const subPath =  `${user_id}/saved-opportunities/${opportunity_id}`;
+  const subPath = `${user_id}/saved-opportunities/${opportunity_id}`;
 
   return deleteUserSavedOpportunity({
     subPath,

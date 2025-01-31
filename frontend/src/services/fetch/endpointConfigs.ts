@@ -29,9 +29,6 @@ export const userLogoutEndpoint = {
   method: "POST" as ApiMethod,
 };
 
-
-
-
 export const userDeleteSavedOpportunityEndpoint = {
   basePath: environment.API_URL,
   version: "v1",
@@ -52,4 +49,3 @@ export const userPostSavedOpportunityEndpoint = {
   namespace: "users",
   method: "POST" as ApiMethod,
 };
-
