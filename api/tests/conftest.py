@@ -220,6 +220,14 @@ def opportunity_index_alias(search_client, monkeypatch_session):
     return alias
 
 
+@pytest.fixture(scope="class")
+def opportunity_search_index_class(search_client, monkeypatch):
+    # Note we don't actually create anything, this is just a random name
+    alias = f"test-opportunity-index-alias-{uuid.uuid4().int}"
+    monkeypatch.setenv("OPPORTUNITY_SEARCH_INDEX_ALIAS", alias)
+    return alias
+
+
 def _generate_rsa_key_pair():
     # Rather than define a private/public key, generate one for the tests
     key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
