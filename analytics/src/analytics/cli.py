@@ -50,18 +50,14 @@ app.add_typer(import_app, name="import", help="Import data into the database")
 app.add_typer(etl_app, name="etl", help="Transform and load local file")
 
 
-def init() -> None:
-    """Shared init function for all scripts."""
-    # Setup logging
-    init_logging(__package__)
-    init_app(logging.root)
+# Setup logging
+init_logging(__package__)
+init_app(logging.root)
 
 
 @app.callback()
 def callback() -> None:
     """Analyze data about the Simpler.Grants.gov project."""
-    # If you override this callback, remember to call init()
-    init()
 
 
 # ===========================================================
