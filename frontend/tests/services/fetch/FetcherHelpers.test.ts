@@ -1,34 +1,11 @@
 import "server-only";
 
-import { ApiRequestError, NetworkError, UnauthorizedError } from "src/errors";
+import { UnauthorizedError } from "src/errors";
 import {
   createRequestUrl,
-  sendRequest,
   throwError,
 } from "src/services/fetch/fetcherHelpers";
-import { QueryParamData } from "src/types/search/searchRequestTypes";
 import { wrapForExpectedError } from "src/utils/testing/commonTestUtils";
-
-const searchInputs: QueryParamData = {
-  status: new Set(["active"]),
-  fundingInstrument: new Set(["grant"]),
-  eligibility: new Set(["public"]),
-  agency: new Set(["NASA"]),
-  category: new Set(["science"]),
-  query: "space exploration",
-  sortby: "relevancy",
-  page: 1,
-};
-
-const responseJsonMock = jest
-  .fn()
-  .mockResolvedValue({ data: [], errors: [], warnings: [] });
-
-const fetchMock = jest.fn().mockResolvedValue({
-  json: responseJsonMock,
-  ok: true,
-  status: 200,
-});
 
 describe("createRequestUrl", () => {
   it("creates the correct url without search params", () => {
@@ -75,105 +52,23 @@ describe("createRequestUrl", () => {
   });
 });
 
-describe("sendRequest", () => {
-  let originalFetch: typeof global.fetch;
-  beforeAll(() => {
-    originalFetch = global.fetch;
-  });
-  afterAll(() => {
-    global.fetch = originalFetch;
-  });
-  beforeEach(() => {
-    global.fetch = fetchMock;
-  });
-  it("returns expected response body and calls fetch with expected arguments on successful request", async () => {
-    const response = await sendRequest("any-url", {
-      body: JSON.stringify({ key: "value" }),
-      headers: {
-        "Content-Type": "application/json",
-        "Header-Name": "headerValue",
-      },
-      method: "POST",
-    });
-    expect(fetchMock).toHaveBeenCalledWith("any-url", {
-      body: JSON.stringify({ key: "value" }),
-      headers: {
-        "Content-Type": "application/json",
-        "Header-Name": "headerValue",
-      },
-      method: "POST",
-    });
-    expect(response).toEqual({ data: [], errors: [], warnings: [] });
-  });
-
-  it("handles `not ok` errors as expected", async () => {
-    const errorMock = jest.fn().mockResolvedValue({
-      json: responseJsonMock,
-      ok: false,
-      status: 200,
-    });
-    global.fetch = errorMock;
-
-    const sendErrorRequest = async () => {
-      await sendRequest(
-        "any-url",
-        {
-          body: JSON.stringify({ key: "value" }),
-          headers: {
-            "Content-Type": "application/json",
-            "Header-Name": "headerValue",
-          },
-          method: "POST",
-        },
-        searchInputs,
-      );
-    };
-
-    await expect(sendErrorRequest()).rejects.toThrow(
-      new ApiRequestError("", "APIRequestError", 0, { searchInputs }),
-    );
-  });
-
-  it("handles network errors as expected", async () => {
-    const networkError = new Error("o no an error");
-    const errorMock = jest.fn(() => {
-      throw networkError;
-    });
-    global.fetch = errorMock;
-
-    const sendErrorRequest = async () => {
-      await sendRequest(
-        "any-url",
-        {
-          body: JSON.stringify({ key: "value" }),
-          headers: {
-            "Content-Type": "application/json",
-            "Header-Name": "headerValue",
-          },
-          method: "POST",
-        },
-        searchInputs,
-      );
-    };
-
-    await expect(sendErrorRequest()).rejects.toThrow(
-      new NetworkError(networkError, searchInputs),
-    );
-  });
-});
-
 describe("throwError", () => {
   it("passes along message from response and details from first error, in error type based on status code", async () => {
     const expectedError = await wrapForExpectedError<Error>(() => {
       throwError(
-        { data: {}, message: "response message", status_code: 401 },
-        "http://any.url",
-        undefined,
         {
-          field: "fieldName",
-          type: "a subtype",
-          message: "a detailed message",
+          data: {},
+          message: "response message",
+          status_code: 401,
+          errors: [
+            {
+              field: "fieldName",
+              type: "a subtype",
+              message: "a detailed message",
+            },
+          ],
         },
+        "http://any.url",
       );
     });
     expect(expectedError).toBeInstanceOf(UnauthorizedError);

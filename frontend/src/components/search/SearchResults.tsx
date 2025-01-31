@@ -9,6 +9,7 @@ import SearchPaginationFetch from "src/components/search/SearchPaginationFetch";
 import SearchResultsHeader from "src/components/search/SearchResultsHeader";
 import SearchResultsHeaderFetch from "src/components/search/SearchResultsHeaderFetch";
 import SearchResultsListFetch from "src/components/search/SearchResultsListFetch";
+import { ExportSearchResultsButton } from "./ExportSearchResultsButton";
 
 export default function SearchResults({
   searchParams,
@@ -36,19 +37,21 @@ export default function SearchResults({
         />
       </Suspense>
       <div className="usa-prose">
-        <Suspense
-          key={pager1key}
-          fallback={
-            <SearchPagination loading={true} page={page} query={query} />
-          }
-        >
-          <SearchPaginationFetch
-            page={page}
-            query={query}
-            searchResultsPromise={searchResultsPromise}
-            scroll={false}
-          />
-        </Suspense>
+        <div className="tablet-lg:display-flex">
+          <ExportSearchResultsButton />
+          <Suspense
+            key={pager1key}
+            fallback={
+              <SearchPagination loading={true} page={page} query={query} />
+            }
+          >
+            <SearchPaginationFetch
+              page={page}
+              query={query}
+              searchResultsPromise={searchResultsPromise}
+            />
+          </Suspense>
+        </div>
         <Suspense key={key} fallback={<Loading message={loadingMessage} />}>
           <SearchResultsListFetch searchResultsPromise={searchResultsPromise} />
         </Suspense>

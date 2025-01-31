@@ -8,7 +8,7 @@ interface SearchPaginationProps {
   searchResultsPromise: Promise<SearchAPIResponse>;
   // Determines whether clicking on pager items causes a scroll to the top of the search
   // results. Created so the bottom pager can scroll.
-  scroll: boolean;
+  scroll?: boolean;
   page: number;
   query?: string | null;
 }
@@ -17,7 +17,7 @@ export default async function SearchPaginationFetch({
   page,
   query,
   searchResultsPromise,
-  scroll,
+  scroll = false,
 }: SearchPaginationProps) {
   const searchResults = await searchResultsPromise;
   const totalPages = searchResults.pagination_info?.total_pages;

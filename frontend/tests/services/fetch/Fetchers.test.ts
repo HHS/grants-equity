@@ -9,11 +9,26 @@ const createRequestUrlMock = jest.fn(
     return "fakeurl";
   },
 );
-const sendRequestMock = jest.fn((..._args) => Promise.resolve("done"));
+const fakeJsonBody = {
+  data: [],
+  errors: [],
+  warnings: [],
+};
+
+const responseJsonMock = jest.fn().mockResolvedValue(fakeJsonBody);
+
+const fakeResponse = {
+  json: responseJsonMock,
+  ok: true,
+};
+
+const fetchMock = jest.fn().mockResolvedValue(fakeResponse);
+
 const createRequestBodyMock = jest.fn((obj) => JSON.stringify(obj));
 const getDefaultHeadersMock = jest.fn(() => ({
   "Content-Type": "application/json",
 }));
+const throwErrorMock = jest.fn();
 
 jest.mock("src/services/fetch/fetcherHelpers", () => ({
   createRequestUrl: (
@@ -32,9 +47,9 @@ jest.mock("src/services/fetch/fetcherHelpers", () => ({
       subPath,
       _body,
     ),
-  sendRequest: (...args: unknown[]) => sendRequestMock(...args),
   createRequestBody: (arg: unknown) => createRequestBodyMock(arg),
   getDefaultHeaders: () => getDefaultHeadersMock(),
+  throwError: (...args: unknown[]): unknown => throwErrorMock(...args),
 }));
 
 jest.mock("react", () => ({
@@ -50,23 +65,25 @@ describe("requesterForEndpoint", () => {
     method: "POST",
   };
 
+  let originalFetch: typeof global.fetch;
+  beforeAll(() => {
+    originalFetch = global.fetch;
+  });
+  afterAll(() => {
+    global.fetch = originalFetch;
+  });
+  beforeEach(() => {
+    global.fetch = fetchMock;
+  });
+
   it("returns a function", () => {
     expect(typeof requesterForEndpoint(basicEndpoint)).toBe("function");
   });
 
-  it("returns a function that calls `createRequestUrl` andf `sendRequest` with the expected arguments", async () => {
+  it("returns a function that calls `createRequestUrl` and `fetch` with the expected arguments", async () => {
     const requester = requesterForEndpoint(basicEndpoint);
     await requester({
       subPath: "1",
-      queryParamData: {
-        page: 1,
-        status: new Set(),
-        fundingInstrument: new Set(),
-        eligibility: new Set(),
-        agency: new Set(),
-        category: new Set(),
-        sortby: null,
-      },
       body: { key: "value" },
       additionalHeaders: { "Header-Name": "headerValue" },
     });
@@ -78,25 +95,40 @@ describe("requesterForEndpoint", () => {
       "1",
       { key: "value" },
     );
-    expect(sendRequestMock).toHaveBeenCalledWith(
-      "fakeurl/1",
-      {
-        body: JSON.stringify({ key: "value" }),
-        headers: {
-          "Content-Type": "application/json",
-          "Header-Name": "headerValue",
-        },
-        method: "POST",
+    expect(fetchMock).toHaveBeenCalledWith("fakeurl/1", {
+      body: JSON.stringify({ key: "value" }),
+      headers: {
+        "Content-Type": "application/json",
+        "Header-Name": "headerValue",
       },
-      {
-        page: 1,
-        status: new Set(),
-        fundingInstrument: new Set(),
-        eligibility: new Set(),
-        agency: new Set(),
-        category: new Set(),
-        sortby: null,
-      },
-    );
+      method: "POST",
+    });
+  });
+  it("returns a function that returns a fetch response", async () => {
+    const requester = requesterForEndpoint(basicEndpoint);
+    const response = await requester({
+      subPath: "1",
+      body: { key: "value" },
+      additionalHeaders: { "Header-Name": "headerValue" },
+    });
+    expect(response).toEqual(fakeResponse);
+  });
+  it("extracts errors from json response where applicable", async () => {
+    fetchMock.mockResolvedValue({
+      json: responseJsonMock,
+      ok: false,
+      status: 404,
+      headers: { get: () => "application/json" },
+    });
+
+    const requester = requesterForEndpoint(basicEndpoint);
+
+    await requester({
+      subPath: "1",
+      body: { key: "value" },
+      additionalHeaders: { "Header-Name": "headerValue" },
+    });
+    expect(responseJsonMock).toHaveBeenCalledTimes(1);
+    expect(throwErrorMock).toHaveBeenCalledWith(fakeJsonBody, "fakeurl/1");
   });
 });

@@ -11,6 +11,8 @@ interface IconProps {
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 const sprite_uri = SpriteSVG.src as string;
 
+// height prop doesn't seem to work
+// do we want to go all in on this rather than the trussworks component?
 export function USWDSIcon(props: IconProps) {
   return (
     <svg

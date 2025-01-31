@@ -19,7 +19,7 @@ jest.mock("next/server", () => ({
 
 // note that all calls to the GET endpoint need to be caught here since the behavior of the Next redirect
 // is to throw an error
-describe("GET request", () => {
+describe("session GET request", () => {
   afterEach(() => jest.clearAllMocks());
   it("returns the current session token when one exists", async () => {
     getSessionMock.mockImplementation(() => ({

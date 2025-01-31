@@ -14,7 +14,7 @@ import {
   parseFeatureFlagsFromString,
   setCookie,
 } from "src/services/featureFlags/featureFlagHelpers";
-import { ServerSideSearchParams } from "src/types/searchRequestURLTypes";
+import { OptionalStringDict } from "src/types/searchRequestURLTypes";
 
 import { ReadonlyRequestCookies } from "next/dist/server/web/spec-extension/adapters/request-cookies";
 import { NextRequest, NextResponse } from "next/server";
@@ -84,7 +84,7 @@ export class FeatureFlagsManager {
   isFeatureEnabled(
     name: string,
     cookies: NextRequest["cookies"] | ReadonlyRequestCookies,
-    searchParams?: ServerSideSearchParams,
+    searchParams?: OptionalStringDict,
   ): boolean {
     if (!isValidFeatureFlag(name)) {
       throw new Error(`\`${name}\` is not a valid feature flag`);

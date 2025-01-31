@@ -1,6 +1,7 @@
 import {
   buildFilters,
   buildPagination,
+  downloadOpportunities,
   searchForOpportunities,
 } from "src/services/fetch/fetchers/searchFetcher";
 import {
@@ -22,7 +23,12 @@ const searchProps: QueryParamData = {
   fieldChanged: "baseball",
 };
 
-const mockfetchOpportunitySearch = jest.fn().mockResolvedValue({ data: {} });
+const mockfetchOpportunitySearch = jest.fn().mockResolvedValue({
+  json: () => ({
+    data: {},
+  }),
+  body: { data: {} },
+});
 
 jest.mock("react", () => ({
   ...jest.requireActual<typeof import("react")>("react"),
@@ -36,7 +42,10 @@ jest.mock("src/services/fetch/fetchers/fetchers", () => ({
 }));
 
 describe("searchForOpportunities", () => {
-  it("calls request function with correct parameters", async () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+  it("calls request function with correct parameters and returns json data from response", async () => {
     const result = await searchForOpportunities(searchProps);
 
     expect(mockfetchOpportunitySearch).toHaveBeenCalledWith({
@@ -57,24 +66,46 @@ describe("searchForOpportunities", () => {
           },
         },
       },
-      queryParamData: {
-        actionType: "fun",
-        agency: new Set(),
-        category: new Set(),
-        eligibility: new Set(),
-        fieldChanged: "baseball",
-        fundingInstrument: new Set(["grant", "cooperative_agreement"]),
-        page: 1,
-        query: "research",
-        sortby: "opportunityNumberAsc",
-        status: new Set(["forecasted", "posted"]),
-      },
     });
 
     expect(result).toEqual({
       actionType: "fun",
       data: {},
       fieldChanged: "baseball",
+    });
+  });
+});
+
+describe("downloadOpportunities", () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+  it("calls request function with correct parameters and returns response", async () => {
+    const result = await downloadOpportunities(searchProps);
+
+    expect(mockfetchOpportunitySearch).toHaveBeenCalledWith({
+      body: {
+        pagination: {
+          order_by: "opportunity_number", // This should be the actual value being used in the API method
+          page_offset: 1,
+          page_size: 5000,
+          sort_direction: "ascending", // or "descending" based on your sortby parameter
+        },
+        query: "research",
+        filters: {
+          opportunity_status: {
+            one_of: ["forecasted", "posted"],
+          },
+          funding_instrument: {
+            one_of: ["grant", "cooperative_agreement"],
+          },
+        },
+        format: "csv",
+      },
+    });
+
+    expect(result).toEqual({
+      data: {},
     });
   });
 });

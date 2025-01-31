@@ -1,3 +1,10 @@
+import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+import timezone from "dayjs/plugin/timezone";
+
+dayjs.extend(timezone);
+dayjs.extend(advancedFormat);
+
 // Convert "2024-02-21" to "February 21, 2024"
 export function formatDate(dateStr: string | null): string {
   if (!dateStr || dateStr.length !== 10) {
@@ -23,3 +30,5 @@ export function formatDate(dateStr: string | null): string {
   };
   return date.toLocaleDateString("en-US", options);
 }
+
+export const getConfiguredDayJs = () => dayjs;

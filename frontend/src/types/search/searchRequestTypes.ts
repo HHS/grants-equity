@@ -26,6 +26,7 @@ export type SearchRequestBody = {
   pagination: PaginationRequestBody;
   filters?: SearchFilterRequestBody;
   query?: string;
+  format?: string;
 };
 
 export enum SearchFetcherActionType {

@@ -5,7 +5,7 @@ import {
   SearchFetcherActionType,
   SortOptions,
 } from "src/types/search/searchRequestTypes";
-import { ServerSideSearchParams } from "src/types/searchRequestURLTypes";
+import { OptionalStringDict } from "src/types/searchRequestURLTypes";
 
 // Search params (query string) coming from the request URL into the server
 // can be a string, string[], or undefined.
@@ -13,7 +13,7 @@ import { ServerSideSearchParams } from "src/types/searchRequestURLTypes";
 
 // The above doesn't seem to still be true, should we update? - DWS
 export function convertSearchParamsToProperTypes(
-  params: ServerSideSearchParams,
+  params: OptionalStringDict,
 ): QueryParamData {
   return {
     ...params,

@@ -1,4 +1,4 @@
-import { ServerSideSearchParams } from "src/types/searchRequestURLTypes";
+import { OptionalStringDict } from "src/types/searchRequestURLTypes";
 
 export enum Breakpoints {
   CARD = "card",
@@ -13,7 +13,7 @@ export enum Breakpoints {
 }
 
 export type WithFeatureFlagProps = {
-  searchParams: Promise<ServerSideSearchParams>;
+  searchParams: Promise<OptionalStringDict>;
 };
 
 export interface ErrorProps {

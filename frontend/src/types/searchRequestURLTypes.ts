@@ -5,6 +5,6 @@ export interface ServerSideRouteParams {
 }
 
 // Query param prop for app router server-side pages
-export interface ServerSideSearchParams {
+export interface OptionalStringDict {
   [key: string]: string | undefined;
 }

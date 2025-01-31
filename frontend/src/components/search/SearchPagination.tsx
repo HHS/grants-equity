@@ -63,9 +63,14 @@ export default function SearchPagination({
   const pageCount = totalPages || Number(totalPagesFromQuery);
 
   return (
-    <div className={`grants-pagination ${loading ? "disabled" : ""}`}>
+    <div
+      className={
+        "desktop:grid-col-fill desktop:display-flex flex-justify-center"
+      }
+    >
       {totalResults !== "0" && pageCount > 0 && (
         <Pagination
+          className={`grants-pagination padding-top-2 border-top-1px border-base tablet-lg:padding-top-0 tablet-lg:border-top-0 ${loading ? "disabled" : ""}`}
           aria-disabled={loading}
           pathname="/search"
           totalPages={pageCount}

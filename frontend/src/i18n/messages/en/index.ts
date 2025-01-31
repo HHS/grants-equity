@@ -621,6 +621,9 @@ export const messages = {
     generic_error_cta: "Please try your search again.",
     validationError: "Search Validation Error",
     tooLongError: "Search terms must be no longer than 100 characters.",
+    exportButton: {
+      title: "Export results",
+    },
   },
   Maintenance: {
     heading: "Simpler.Grants.gov Is Currently Undergoing Maintenance",

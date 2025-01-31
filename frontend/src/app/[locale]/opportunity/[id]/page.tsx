@@ -3,7 +3,7 @@ import NotFound from "src/app/[locale]/not-found";
 import { OPPORTUNITY_CRUMBS } from "src/constants/breadcrumbs";
 import { ApiRequestError, parseErrorStatus } from "src/errors";
 import withFeatureFlag from "src/hoc/withFeatureFlag";
-import { fetchOpportunity } from "src/services/fetch/fetchers/fetchers";
+import { getOpportunityDetails } from "src/services/fetch/fetchers/opportunityFetcher";
 import { Opportunity } from "src/types/opportunity/opportunityResponseTypes";
 import { WithFeatureFlagProps } from "src/types/uiTypes";
 
@@ -38,9 +38,7 @@ export async function generateMetadata({
   const t = await getTranslations({ locale });
   let title = `${t("OpportunityListing.page_title")}`;
   try {
-    const { data: opportunityData } = await fetchOpportunity({
-      subPath: id,
-    });
+    const { data: opportunityData } = await getOpportunityDetails(id);
     title = `${t("OpportunityListing.page_title")} - ${opportunityData.opportunity_title}`;
   } catch (error) {
     console.error("Failed to render page title due to API error", error);
@@ -106,7 +104,7 @@ async function OpportunityListing({ params }: OpportunityListingProps) {
 
   let opportunityData = {} as Opportunity;
   try {
-    const response = await fetchOpportunity({ subPath: id });
+    const response = await getOpportunityDetails(id);
     opportunityData = response.data;
   } catch (error) {
     if (parseErrorStatus(error as ApiRequestError) === 404) {

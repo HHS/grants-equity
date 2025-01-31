@@ -54,9 +54,9 @@ test.describe("Search page tests", () => {
       "category-agriculture": "agriculture",
     };
 
-    await selectSortBy(page, "agencyDesc");
-
     await waitForSearchResultsInitialLoad(page);
+
+    await selectSortBy(page, "agencyDesc");
 
     if (project.name.match(/[Mm]obile/)) {
       await toggleMobileSearchFilters(page);
@@ -156,11 +156,11 @@ test.describe("Search page tests", () => {
     page,
   }: PageProps) => {
     await page.goto("/search");
+    await waitForSearchResultsInitialLoad(page);
+
     await selectSortBy(page, "opportunityTitleDesc");
 
     await clickLastPaginationPage(page);
-
-    await waitForSearchResultsInitialLoad(page);
 
     const lastSearchResultTitle = await getLastSearchResultTitle(page);
 

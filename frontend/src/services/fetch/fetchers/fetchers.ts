@@ -1,5 +1,6 @@
 import "server-only";
 
+import { ApiRequestError } from "src/errors";
 import {
   EndpointConfig,
   fetchOpportunityEndpoint,
@@ -9,22 +10,20 @@ import {
 import {
   createRequestBody,
   createRequestUrl,
+  fetchErrorToNetworkError,
   getDefaultHeaders,
   HeadersDict,
   JSONRequestBody,
-  sendRequest,
+  throwError,
 } from "src/services/fetch/fetcherHelpers";
 import { APIResponse } from "src/types/apiResponseTypes";
-import { OpportunityApiResponse } from "src/types/opportunity/opportunityResponseTypes";
-import { QueryParamData } from "src/types/search/searchRequestTypes";
-import { SearchAPIResponse } from "src/types/search/searchResponseTypes";
 
 import { cache } from "react";
 
 // returns a function which can be used to make a request to an endpoint defined in the passed config
 // note that subpath is dynamic per request, any static paths at this point would need to be included in the namespace
-// making this more flexible is a future todo
-export function requesterForEndpoint<ResponseType extends APIResponse>({
+// returns the full api response, dealing with parsing the body will happen explicitly for each request type
+export function requesterForEndpoint({
   method,
   basePath,
   version,
@@ -33,12 +32,11 @@ export function requesterForEndpoint<ResponseType extends APIResponse>({
   return async function (
     options: {
       subPath?: string;
-      queryParamData?: QueryParamData; // only used for error handling purposes
       body?: JSONRequestBody;
       additionalHeaders?: HeadersDict;
     } = {},
-  ): Promise<ResponseType> {
-    const { additionalHeaders = {}, body, queryParamData, subPath } = options;
+  ): Promise<Response> {
+    const { additionalHeaders = {}, body, subPath } = options;
     const url = createRequestUrl(
       method,
       basePath,
@@ -52,27 +50,51 @@ export function requesterForEndpoint<ResponseType extends APIResponse>({
       ...additionalHeaders,
     };
 
-    const response = await sendRequest<ResponseType>(
-      url,
-      {
+    let response;
+    try {
+      response = await fetch(url, {
         body: method === "GET" || !body ? null : createRequestBody(body),
         headers,
         method,
-      },
-      queryParamData,
-    );
+      });
+    } catch (error) {
+      // API most likely down, but also possibly an error setting up or sending a request
+      // or parsing the response.
+      throw fetchErrorToNetworkError(error);
+    }
+
+    if (
+      !response.ok &&
+      response.headers.get("Content-Type") === "application/json"
+    ) {
+      // we can assume this is serializable json based on the response header, but we'll catch anyway
+      let jsonBody;
+      try {
+        jsonBody = (await response.json()) as APIResponse;
+      } catch (e) {
+        throw new Error(
+          `bad Json from error response at ${url} with status code ${response.status}`,
+        );
+      }
+      return throwError(jsonBody, url);
+    } else if (!response.ok) {
+      throw new ApiRequestError(
+        `unable to fetch ${url}`,
+        "APIRequestError",
+        response.status,
+      );
+    }
 
     return response;
   };
 }
 
 export const fetchOpportunity = cache(
-  requesterForEndpoint<OpportunityApiResponse>(fetchOpportunityEndpoint),
+  requesterForEndpoint(fetchOpportunityEndpoint),
 );
 
-export const fetchOpportunitySearch = requesterForEndpoint<SearchAPIResponse>(
+export const fetchOpportunitySearch = requesterForEndpoint(
   opportunitySearchEndpoint,
 );
 
-export const postUserLogout =
-  requesterForEndpoint<APIResponse>(userLogoutEndpoint);
+export const postUserLogout = requesterForEndpoint(userLogoutEndpoint);

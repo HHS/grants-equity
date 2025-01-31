@@ -3,7 +3,7 @@
 import QueryProvider from "src/app/[locale]/search/QueryProvider";
 import { usePrevious } from "src/hooks/usePrevious";
 import { FrontendErrorDetails } from "src/types/apiResponseTypes";
-import { ServerSideSearchParams } from "src/types/searchRequestURLTypes";
+import { OptionalStringDict } from "src/types/searchRequestURLTypes";
 import { Breakpoints, ErrorProps } from "src/types/uiTypes";
 import { convertSearchParamsToProperTypes } from "src/utils/search/convertSearchParamsToProperTypes";
 
@@ -19,7 +19,7 @@ import ServerErrorAlert from "src/components/ServerErrorAlert";
 
 export interface ParsedError {
   message: string;
-  searchInputs: ServerSideSearchParams;
+  searchInputs: OptionalStringDict;
   status: number;
   type: string;
   details?: FrontendErrorDetails;
