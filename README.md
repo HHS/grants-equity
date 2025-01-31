@@ -35,6 +35,14 @@ Documentation for the API is linked to from the [API README.md](./api/README.md)
 
 Documentation and development instructions for the front-end are provided in the [Front-end README.md](./frontend/README.md).
 
+### Infrastructure
+
+Documentation about our infrastructure and operations is in [OPERATIONS.md](OPERATIONS.md)
+
+### Documentation
+
+Documentation about how to document things is present in [DOCUMENTATION.md](DOCUMENTATION.md)
+
 ## Contributing
 
 Thank you for considering contributing to an Open Source project of the US

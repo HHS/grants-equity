@@ -12,3 +12,6 @@ Fixes #{ISSUE}
 ## Additional information
 > Screenshots, GIF demos, code examples or output to help show the changes working as expected.
 
+## Documentation
+
+Any documentation added needs to follow our documentation rules in [DOCUMENTATION.md](DOCUMENTATION.md)
