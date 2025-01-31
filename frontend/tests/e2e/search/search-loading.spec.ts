@@ -1,13 +1,13 @@
-import skip, { expect, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 import { chromium } from "playwright-core";
 import {
   fillSearchInputAndSubmit,
   generateRandomString,
 } from "tests/e2e/search/searchSpecUtil";
 
-test.describe("Search page tests", () => {
+test.describe("Search page loading state", () => {
   // Loadiing indicator resolves too quickly to reliably test in e2e.
-  skip("should show and hide loading state", async () => {
+  test.skip("should show and hide loading state", async () => {
     const searchTerm = generateRandomString([4, 5]);
     const searchTerm2 = generateRandomString([8]);
 
