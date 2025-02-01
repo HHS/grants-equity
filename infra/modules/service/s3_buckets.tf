@@ -64,6 +64,41 @@ data "aws_iam_policy_document" "s3_buckets_put_access" {
       identifiers = ["*"]
     }
   }
+
+  dynamic "statement" {
+    for_each = (each.value.public) ? [1] : []
+    content {
+      sid    = "AllowPublicRead"
+      effect = "Allow"
+      resources = [
+        "${aws_s3_bucket.s3_buckets[each.key].arn}/*"
+      ]
+      actions = ["s3:GetObject"]
+      principals {
+        type        = "AWS"
+        identifiers = ["*"]
+      }
+    }
+  }
+
+  dynamic "statement" {
+    for_each = (var.enable_s3_cdn && each.key == var.s3_cdn_bucket_name) ? [1] : []
+    content {
+      sid       = "AllowCloudFrontIngress"
+      effect    = "Allow"
+      resources = ["${aws_s3_bucket.s3_buckets[each.key].arn}/*"]
+      actions   = ["s3:GetObject"]
+      principals {
+        type        = "Service"
+        identifiers = ["cloudfront.amazonaws.com"]
+      }
+      condition {
+        test     = "StringEquals"
+        variable = "AWS:SourceArn"
+        values   = [aws_cloudfront_distribution.cdn[0].arn]
+      }
+    }
+  }
 }
 
 resource "aws_s3_bucket_lifecycle_configuration" "s3_buckets" {
@@ -83,7 +118,11 @@ resource "aws_s3_bucket_lifecycle_configuration" "s3_buckets" {
 
 
 resource "aws_s3_bucket_server_side_encryption_configuration" "s3_buckets" {
-  for_each = var.s3_buckets
+  for_each = {
+    for key, values in var.s3_buckets :
+    key => values
+    if values.public == false
+  }
 
   bucket = aws_s3_bucket.s3_buckets[each.key].id
   rule {

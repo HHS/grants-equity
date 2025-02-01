@@ -25,10 +25,13 @@ locals {
   origin_domain_name = var.enable_alb_cdn ? aws_lb.alb[0].dns_name : var.enable_s3_cdn ? aws_s3_bucket.s3_buckets[var.s3_cdn_bucket_name].bucket_regional_domain_name : null
 }
 
-resource "aws_cloudfront_origin_access_identity" "cdn" {
+resource "aws_cloudfront_origin_access_control" "cdn" {
   count = local.enable_cdn ? 1 : 0
 
-  comment = "Origin Access Identity for CloudFront to access S3 bucket"
+  name                              = var.service_name
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }
 
 resource "aws_cloudfront_cache_policy" "default" {
@@ -63,16 +66,19 @@ resource "aws_cloudfront_distribution" "cdn" {
   aliases = local.cdn_domain_name == null ? null : [local.cdn_domain_name]
 
   origin {
-    domain_name = local.origin_domain_name
-    origin_id   = local.default_origin_id
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = var.cert_arn == null ? "http-only" : "https-only"
+    domain_name              = local.origin_domain_name
+    origin_id                = local.default_origin_id
+    origin_access_control_id = aws_cloudfront_origin_access_control.cdn[0].id
 
-      # See possible values here:
-      # https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_OriginSslProtocols.html
-      origin_ssl_protocols = local.ssl_protocols
+    dynamic "custom_origin_config" {
+      for_each = var.enable_alb_cdn ? [1] : []
+      content {
+        http_port              = 80
+        https_port             = 443
+        origin_protocol_policy = "https-only"
+        # https://docs.aws.amazon.com/cloudfront/latest/APIReference/API_OriginSslProtocols.html
+        origin_ssl_protocols = local.ssl_protocols
+      }
     }
     # https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/origin-shield.html
     dynamic "origin_shield" {
@@ -120,7 +126,6 @@ resource "aws_cloudfront_distribution" "cdn" {
   depends_on = [
     aws_s3_bucket_public_access_block.cdn[0],
     aws_s3_bucket_acl.cdn[0],
-    aws_s3_bucket_policy.cdn[0],
     aws_s3_bucket.cdn[0],
   ]
 
